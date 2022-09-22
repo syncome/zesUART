@@ -122,7 +122,9 @@ class ZesAntarisOperator:
             example = EXAMPLE_RESPONSE.get(cmd.hex()[0], '---')
             line = bytearray.fromhex(example)
 
-        ZesLogger.log("RX " + cmd.hex(), line.hex())
+            ZesLogger.log("RX VIRTUAL " + cmd.hex(), line.hex())
+        else:
+            ZesLogger.log("RX " + cmd.hex(), line.hex())
         return line
 
 
