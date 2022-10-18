@@ -2,7 +2,7 @@ from ZesAntaris import ZesAntarisOperator
 from AntarisCtrl import AntarisCtrl
 from zesThread import FsmThread
 import time
-import antarisAPI.antaris_api as api
+
 from antarisAPI.gen.antaris_api_types import *
 from ZesLogger import ZesLogger
 from config import *
@@ -12,16 +12,15 @@ import os
 import zipfile
 
 
-global zesAppThread
-global channel
-global newFileReceived
-global newFilePath
-global fsms
 
-zesAppThread = None
-channel = None
-newFileReceived = False
-newFilePath = None
+# global channel
+#
+# global fsms
+
+
+# channel = None
+
+
 fsms = dict()
 
 power_status = 0
@@ -30,6 +29,7 @@ power_status = 0
 
 
 def get_thread_by(correlation_id: int):
+    global fsms
     threadID = int(correlation_id / 10000)
     if threadID in fsms:
         return fsms[threadID]
@@ -50,6 +50,7 @@ def shutdown_app(shutdown_param: ShutdownParams):
 
 def start_sequence(start_seq_param: StartSequenceParams):
     # start all sequences
+    global fsms
     for key in fsms:
         fsms[key].start()
 
@@ -58,11 +59,11 @@ def process_passthru_tele_cmd(param: PassthruCmdParams):
     cmd = param.passthru_cmd
     pass
 
-
-def process_new_file_uploaded(param: NewFileUploadedParams):
-    newFileReceived = True
-    filepath = param.file_path
-    if DEBUG: print(f"New file uploaded at: {filepath}")
+# DELETED in ver 0.3
+# def process_new_file_uploaded(param: NewFileUploadedParams):
+#     newFileReceived = True
+#     filepath = param.file_path
+#     if DEBUG: print(f"New file uploaded at: {filepath}")
 
 
 def process_response_register(param: RespRegisterParams):
@@ -80,10 +81,11 @@ def process_response_get_current_location(param: RespGetCurrentLocationParams):
     wakeup_seq_fsm(correlation_id)
 
 
-def process_response_get_current_time(param: RespGetCurrentTimeParams):
-    ZesLogger.log(cmdStr='TIM', dataStr=f'Ctl Tm:{param.epoch_time}, Sys Tm:{time.time()}')
-    correlation_id = param.correlation_id
-    wakeup_seq_fsm(correlation_id)
+# DELETED IN VER 0.3
+# def process_response_get_current_time(param: RespGetCurrentTimeParams):
+#     ZesLogger.log(cmdStr='TIM', dataStr=f'Ctl Tm:{param.epoch_time}, Sys Tm:{time.time()}')
+#     correlation_id = param.correlation_id
+#     wakeup_seq_fsm(correlation_id)
 
 
 def process_response_get_current_power_state(param: RespGetCurrentPowerStateParams):
@@ -94,7 +96,7 @@ def process_response_get_current_power_state(param: RespGetCurrentPowerStatePara
     wakeup_seq_fsm(correlation_id)
 
 
-def process_response_download_file_to_gs(param: RespDownloadFileToGSParams):
+def process_response_download_file_to_gs(param: RespStageFileDownloadParams):
     if DEBUG: print("process_response_download_file_to_gs : ", param.__str__())
     correlation_id = param.correlation_id
     isSuccess = param.req_status == 0
@@ -141,11 +143,11 @@ def monitor_zes_FLAG(mythread: FsmThread):
 def antaris_satellite_status(mythread: FsmThread):
     mythread.state = "STARTED"
 
-    AntarisCtrl.get_controller_time(mythread.channel, mythread.correlation_id)
-    mythread.correlation_id += 1
-    mythread.state = "WAITING_FOR_GET_TIME"
-    mythread.condition.acquire()
-    mythread.condition.wait()
+    # AntarisCtrl.get_controller_time(mythread.channel, mythread.correlation_id)
+    # mythread.correlation_id += 1
+    # mythread.state = "WAITING_FOR_GET_TIME"
+    # mythread.condition.acquire()
+    # mythread.condition.wait()
 
     AntarisCtrl.get_sat_location(mythread.channel, mythread.correlation_id)
     mythread.correlation_id += 1
@@ -184,25 +186,27 @@ def download_logfile_to_groundstation(mythread: FsmThread):
 
 
 def run_payload_in_flight_mode():
+    global fsms
+
     callback_func_list = {
         'StartSequence': start_sequence,
         'Shutdown': shutdown_app,
         'PassthruCmd': process_passthru_tele_cmd,
-        'NewFileUploaded': process_new_file_uploaded,
+        # 'NewFileUploaded': process_new_file_uploaded,
         'HealthCheck': process_health_check,
         'RespRegister': process_response_register,
-        'RespPointToTarget': process_reponse_point_to_target,
+        # 'RespPointToTarget': process_reponse_point_to_target,
         'RespGetCurrentLocation': process_response_get_current_location,
-        'RespGetCurrentTime': process_response_get_current_time,
+        # 'RespGetCurrentTime': process_response_get_current_time,
         'RespGetCurrentPowerState': process_response_get_current_power_state,
-        'RespDownloadFileToGS': process_response_download_file_to_gs,
+        'RespStageFileDownload': process_response_download_file_to_gs,
         'RespPayloadPowerControl' : process_response_payload_power_control,
     }
 
 
 
     # Create Channel to talk to Payload Controller (PC)
-    channel = AntarisCtrl.create_channel(True, callback_func_list)
+    channel = AntarisCtrl.create_insecure_channel(callback_func_list)
 
     if DEBUG: time.sleep(2)  # wait emulated PC to start
 
@@ -231,15 +235,15 @@ def run_payload_in_flight_mode():
     fsms[4].start()
     fsms[4].join()
 
-
-    # replace new file, at the end of task execution
-    if newFileReceived and newFilePath:
-        path, filename = os.path.split(newFilePath)
-        zesAppPath = HOME_FOLDER_PATH + '/zesUART/'
-        payloadFilePath = zesAppPath + filename
-        shutil.copyfile(newFilePath, payloadFilePath)
-        with zipfile.ZipFile(payloadFilePath, 'r') as zip_ref:
-            zip_ref.extractall(zesAppPath)
+    # DELETED IN VER 0.3
+    # # replace new file, at the end of task execution
+    # if newFileReceived and newFilePath:
+    #     path, filename = os.path.split(newFilePath)
+    #     zesAppPath = HOME_FOLDER_PATH + '/zesUART/'
+    #     payloadFilePath = zesAppPath + filename
+    #     shutil.copyfile(newFilePath, payloadFilePath)
+    #     with zipfile.ZipFile(payloadFilePath, 'r') as zip_ref:
+    #         zip_ref.extractall(zesAppPath)
 
     AntarisCtrl.sequence_done(channel)
     AntarisCtrl.delete_channel_and_goodbye(channel)

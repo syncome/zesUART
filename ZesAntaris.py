@@ -427,8 +427,10 @@ class ZesAntarisOperator:
         if DEBUG:
             if PLATFORM == "ANTARIS" and len(avail_memblks_str) > 0:
                 print("\n\n[Debug] >>> Ground Test Passed. \n\n")
+            elif PLATFORM == "WINDOWS" and len(avail_memblks_str) > 0:
+                print("\n\n[Debug] >>> Ground Test Passed on Experimental Device. \n\n")
             else:
-                print("\n\n[Debug] >>> Ground Test Not Valided on Real Device. \n\n")
+                print("\n\n[Debug] >>> Ground Test not passed. \n\n")
 
 
     @classmethod

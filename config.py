@@ -34,14 +34,14 @@ elif PLATFORM == 'WINDOWS':
     Development Settings
     =========================================================
     '''
-    SERIAL_DEVICE = "COM6"
+    SERIAL_DEVICE = "COM5"
 
     GPIO_NRESET_PIN = "/dev/antaris/gpio13/value"
     GPIO_FLAG_PIN = "/dev/antaris/gpio14/value"
 
     HOME_FOLDER_PATH = "E:/Git"
 
-    USE_VIRTUAL_PAYLOAD = True
+    USE_VIRTUAL_PAYLOAD = False
     USE_VIRTUAL_HARDWARE_CTRL = True
     DEBUG = True
 

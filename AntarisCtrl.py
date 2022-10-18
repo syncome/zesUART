@@ -1,5 +1,5 @@
 from config import PLATFORM, USE_VIRTUAL_HARDWARE_CTRL
-import antarisAPI.antaris_api as api
+import antarisAPI.antaris_api_client as api
 from antarisAPI.gen.antaris_api_types import *
 
 
@@ -18,8 +18,12 @@ class AntarisCtrl:
         api.api_pa_pc_get_current_location(channel, correlation_id)
 
     @classmethod
-    def create_channel(cls, encryption, callback_func_list):
-        return api.api_pa_pc_create_channel(encryption, callback_func_list)
+    def create_secure_channel(cls, callback_func_list):
+        return api.api_pa_pc_create_channel(callback_func_list)
+
+    @classmethod
+    def create_insecure_channel(cls, callback_func_list):
+        return api.api_pa_pc_create_insecure_channel(callback_func_list)
 
     @classmethod
     def register_app(cls, channel, correlation_id):
@@ -27,21 +31,9 @@ class AntarisCtrl:
         api.api_pa_pc_register(channel, register_params)
 
     @classmethod
-    def request_location(cls, channel, correlation_id):
-        api.api_pa_pc_get_current_time(channel, correlation_id)
-
-    @classmethod
-    def request_time(cls, channel, correlation_id):
-        api.api_pa_pc_get_current_time(channel, correlation_id)
-
-    @classmethod
-    def get_controller_time(cls, channel, correlation_id):
-        api.api_pa_pc_get_current_time(channel, correlation_id)
-
-    @classmethod
     def download_file_to_groundstation(cls, channel, correlation_id, filePath):
-        download_file_params = ReqDownloadFileToGSParams(correlation_id, filePath)
-        api.api_pa_pc_download_file_to_gs(channel, download_file_params)
+        download_file_params = ReqStageFileDownloadParams(correlation_id, filePath)
+        api.api_pa_pc_stage_file_download(channel, download_file_params)
 
     @classmethod
     def sequence_done(cls, channel):
