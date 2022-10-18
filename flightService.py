@@ -1,7 +1,7 @@
 from ZesAntaris import ZesAntarisOperator
 from AntarisCtrl import AntarisCtrl
 from zesThread import FsmThread
-import time
+import time, sys
 
 from antarisAPI.gen.antaris_api_types import *
 from ZesLogger import ZesLogger
@@ -247,3 +247,7 @@ def run_payload_in_flight_mode():
 
     AntarisCtrl.sequence_done(channel)
     AntarisCtrl.delete_channel_and_goodbye(channel)
+
+
+if __name__ == "__main__":
+    run_payload_in_flight_mode()
