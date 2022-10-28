@@ -25,6 +25,7 @@ def set_POWER_pin(mythread: FsmThread, on: bool):
 def set_NRESET_pin(value: bool):
     lock = threading.Lock()
     lock.acquire()
+    print('will set NREST PIN')
     with open(GPIO_NRESET_PIN, 'w') as f:
         f.write('1' if value else '0')
     lock.release()

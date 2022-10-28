@@ -17,11 +17,20 @@ def start_zes_ground_test(mythread: FsmThread):
     ZesAntarisOperator.ground_test_mode(mythread)
     mythread.state = "EXISTING"
 
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+
 def start_zes_flight_test(mythread: FsmThread):
     mythread.state = "STARTED"
+
+    # AntarisCtrl.get_sat_location(mythread.channel, mythread.correlation_id)
+    # mythread.condition.acquire()
+    # mythread.condition.wait()
+
     ZesAntarisOperator.power_on_and_prepare_payload_if_necessary(mythread)
     ZesAntarisOperator.one_time_flight_service_mode(mythread)
     mythread.state = "EXISTING"
+
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
 
 def start_test_sequence(start_seq_param):
     # start all sequences
@@ -53,12 +62,15 @@ def zes_app_test(mode='ground'):
         print("Error : Create Channel failed")
         exit()
 
+
     # Create FSM threads  (arg : channel, thread-id, correlation_id, count, seq_id, fsm-function)
     if mode == 'ground':
         fsms[1] = FsmThread(channel, 1, 10000, 'ZES_GROUND_TEST', start_zes_ground_test)
     else:
         fsms[1] = FsmThread(channel, 1, 10000, 'ZES_FLIGHT_TEST', start_zes_flight_test)
 
+    print("===================================")
+    print(fsms[1].seq_id)
 
     AntarisCtrl.register_app(channel, 10000)
 
@@ -75,12 +87,12 @@ def zes_app_test(mode='ground'):
     fsms[4].start()
     fsms[4].join()
 
-    AntarisCtrl.sequence_done(channel)
+
     AntarisCtrl.delete_channel_and_goodbye(channel)
 
 
 if __name__ == "__main__":
     mode = 'ground'
     if sys.argv and len(sys.argv) >= 2:
-        mode = int(sys.argv[1])
+        mode = sys.argv[1]
     zes_app_test(mode)

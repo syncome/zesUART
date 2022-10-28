@@ -1,20 +1,23 @@
 from config import PLATFORM, USE_VIRTUAL_HARDWARE_CTRL
 import antarisAPI.antaris_api_client as api
 from antarisAPI.gen.antaris_api_types import *
-
+from config import DEBUG
 
 class AntarisCtrl:
     @classmethod
     def get_power_status(cls, channel, correlation_id):
+        if DEBUG: print('[Sent] get_power_status, correlation_id=', correlation_id, '\n\n')
         api.api_pa_pc_get_current_power_state(channel, correlation_id)
 
     @classmethod
     def set_power_pin(cls, channel, correlation_id, on=True):
-        payload_power_control_params = ReqPayloadPowerControlParams(correlation_id, 1 if on else 0)
-        api.api_pa_pc_payload_power_control(channel, payload_power_control_params)
+        params = ReqPayloadPowerControlParams(correlation_id, 1 if on else 0)
+        if DEBUG: print('[Sent] ReqPayloadPowerControlParams =', params, '\n\n')
+        api.api_pa_pc_payload_power_control(channel, params)
 
     @classmethod
     def get_sat_location(cls, channel, correlation_id):
+        if DEBUG: print('[Sent] get_sat_location, correlation_id=', correlation_id, '\n\n')
         api.api_pa_pc_get_current_location(channel, correlation_id)
 
     @classmethod
@@ -28,16 +31,19 @@ class AntarisCtrl:
     @classmethod
     def register_app(cls, channel, correlation_id):
         register_params = ReqRegisterParams(correlation_id, 0)
+        if DEBUG: print('[Sent] ReqRegisterParams =', register_params, '\n\n')
         api.api_pa_pc_register(channel, register_params)
 
     @classmethod
     def download_file_to_groundstation(cls, channel, correlation_id, filePath):
         download_file_params = ReqStageFileDownloadParams(correlation_id, filePath)
+        if DEBUG: print('[Sent] ReqStageFileDownloadParams =', download_file_params, '\n\n')
         api.api_pa_pc_stage_file_download(channel, download_file_params)
 
     @classmethod
-    def sequence_done(cls, channel):
-        sequence_done_params = CmdSequenceDoneParams(0)
+    def sequence_done(cls, channel, sequence_id):
+        sequence_done_params = CmdSequenceDoneParams(sequence_id)
+        if DEBUG: print('[Sent] CmdSequenceDoneParams =', sequence_done_params, '\n\n')
         api.api_pa_pc_sequence_done(channel, sequence_done_params)
 
     @classmethod

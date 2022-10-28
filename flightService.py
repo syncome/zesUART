@@ -37,6 +37,7 @@ def get_thread_by(correlation_id: int):
         return None
 
 def wakeup_seq_fsm(correlation_id: int):
+    print("wakeup_deq_fsm called:", correlation_id)
     myThread = get_thread_by(correlation_id)
     if myThread:
         myThread.condition.acquire()
@@ -46,9 +47,11 @@ def wakeup_seq_fsm(correlation_id: int):
         print(f"Thread not found for correlation_id={correlation_id}")
 
 def shutdown_app(shutdown_param: ShutdownParams):
+    if DEBUG: print('[Received] shutdown_param:', shutdown_param)
     pass
 
 def start_sequence(start_seq_param: StartSequenceParams):
+    if DEBUG: print('[Received] start_seq_param:', start_seq_param)
     # start all sequences
     global fsms
     for key in fsms:
@@ -56,6 +59,7 @@ def start_sequence(start_seq_param: StartSequenceParams):
 
 
 def process_passthru_tele_cmd(param: PassthruCmdParams):
+    if DEBUG: print('[Received] process_passthru_tele_cmd:', param)
     cmd = param.passthru_cmd
     pass
 
@@ -67,15 +71,17 @@ def process_passthru_tele_cmd(param: PassthruCmdParams):
 
 
 def process_response_register(param: RespRegisterParams):
+    if DEBUG: print('[Received] process_response_register:', param)
     correlation_id = param.correlation_id
 
 
 def process_reponse_point_to_target(resp_point_to_target_param):
-    if DEBUG: print("process_response_point_to_target")
+    if DEBUG: print('[Received] process_reponse_point_to_target:', resp_point_to_target_param)
     pass
 
 
 def process_response_get_current_location(param: RespGetCurrentLocationParams):
+    if DEBUG: print('[Received] process_response_get_current_location:', param)
     ZesLogger.log(cmdStr='LOC', dataStr=f'Lon:{param.longitude}, Lat:{param.latitude}, Alt:{param.altitude}')
     correlation_id = param.correlation_id
     wakeup_seq_fsm(correlation_id)
@@ -89,7 +95,7 @@ def process_response_get_current_location(param: RespGetCurrentLocationParams):
 
 
 def process_response_get_current_power_state(param: RespGetCurrentPowerStateParams):
-    if DEBUG: print("process_response_get_current_power_state : ", param)
+    if DEBUG: print("[Received] process_response_get_current_power_state : ", param)
     correlation_id = param.correlation_id
     relatedThread = get_thread_by(correlation_id)
     relatedThread.is_pl_power_on = param.power_state == "ON"   # TODO: Check and verify
@@ -97,7 +103,7 @@ def process_response_get_current_power_state(param: RespGetCurrentPowerStatePara
 
 
 def process_response_download_file_to_gs(param: RespStageFileDownloadParams):
-    if DEBUG: print("process_response_download_file_to_gs : ", param.__str__())
+    if DEBUG: print("[Received] process_response_download_file_to_gs : ", param)
     correlation_id = param.correlation_id
     isSuccess = param.req_status == 0
     relatedThread = get_thread_by(correlation_id)
@@ -110,13 +116,15 @@ def process_response_download_file_to_gs(param: RespStageFileDownloadParams):
 
 
 def process_health_check(health_check_param: RespHealthCheckParams):
-    if DEBUG: print("process_health_check", health_check_param.__str__())
+    if DEBUG: print("[Received] process_health_check", health_check_param)
     pass
 
 
 def process_response_payload_power_control(param: RespPayloadPowerControlParams):
-    if DEBUG: print("process_response_payload_power_control", param.__str__())
+    if DEBUG: print("[Received] RespPayloadPowerControlParams = ", param)
     correlation_id = param.correlation_id
+    # if correlation_id == 0:
+    #     correlation_id = 10000
     relatedThread = get_thread_by(correlation_id)
     if relatedThread.will_power_on is not None:
         relatedThread.is_pl_power_on = relatedThread.will_power_on
@@ -131,6 +139,8 @@ def start_zes_app(mythread: FsmThread):
     ZesAntarisOperator.power_on_and_prepare_payload_if_necessary(mythread)
     ZesAntarisOperator.one_time_flight_service_mode(mythread)
     mythread.state = "EXISTING"
+
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
 
 
 def monitor_zes_FLAG(mythread: FsmThread):
@@ -161,6 +171,9 @@ def antaris_satellite_status(mythread: FsmThread):
     print("sequence_a_fsm : state : ", mythread.state)
     mythread.condition.release()
 
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+
+
 
 def download_logfile_to_groundstation(mythread: FsmThread):
     mythread.state = "STARTED"
@@ -182,7 +195,8 @@ def download_logfile_to_groundstation(mythread: FsmThread):
 
     ZesLogger.clean_old_files()
     mythread.state = "EXISTING"
-    pass
+
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
 
 
 def run_payload_in_flight_mode():
@@ -200,7 +214,7 @@ def run_payload_in_flight_mode():
         # 'RespGetCurrentTime': process_response_get_current_time,
         'RespGetCurrentPowerState': process_response_get_current_power_state,
         'RespStageFileDownload': process_response_download_file_to_gs,
-        'RespPayloadPowerControl' : process_response_payload_power_control,
+        'RespPayloadPowerControl': process_response_payload_power_control,
     }
 
 

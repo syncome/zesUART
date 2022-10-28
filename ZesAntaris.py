@@ -14,6 +14,12 @@ from zesThread import FsmThread
 
 if PLATFORM == 'ANTARIS':
     from gpio_antaris import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
+elif PLATFORM == 'ANTARIS-DOCKER':
+    from gpio_virtual import read_STATUS_pin, set_NRESET_pin
+    if USE_VIRTUAL_HARDWARE_CTRL:
+        from gpio_virtual import set_POWER_pin, get_POWER_state
+    else:
+        from gpio_antaris import set_POWER_pin, get_POWER_state
 elif PLATFORM == 'RPI':
     from gpio_rpi import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
 else:
@@ -94,29 +100,31 @@ class ZesAntarisOperator:
 
 
     def send_to_serial(cls, cmd):
-        while True:
-            numofFail = 0
-            try:
-                ser = serial.Serial(port=SERIAL_DEVICE, baudrate=SERIAL_BAUDRATE, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=0.1)
-                break
-            except Exception as err:
-                ZesLogger.log('ERR', f'Cannot open serial port {SERIAL_DEVICE}')
-                if DEBUG:
-                    print(f'[Debug] >>>  Could not open port, retrying. error as follows: {err}')
-
-                numofFail += 1
-                if numofFail > 20:
-                    # Reset Board
+        line = None
+        if not USE_VIRTUAL_PAYLOAD:
+            while True:
+                numofFail = 0
+                try:
+                    ser = serial.Serial(port=SERIAL_DEVICE, baudrate=SERIAL_BAUDRATE, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=0.1)
+                    break
+                except Exception as err:
+                    ZesLogger.log('ERR', f'Cannot open serial port {SERIAL_DEVICE}')
                     if DEBUG:
-                        print('[Debug] >>>  Could not open port, failed 20 times, aborted.')
-                        raise ValueError(err)
+                        print(f'[Debug] >>>  Could not open port, retrying. error as follows: {err}')
 
-                time.sleep(1 + numofFail)
-        ser.write(cmd)
-        ZesLogger.log("TX " + cmd.hex(), "")
-        time.sleep(0.1)
-        # msg = ser.read(size=SERIAL_READ_BUFFER_SIZE)
-        line = ser.readline()
+                    numofFail += 1
+                    if numofFail > 20:
+                        # Reset Board
+                        if DEBUG:
+                            print('[Debug] >>>  Could not open port, failed 20 times, aborted.')
+                            raise ValueError(err)
+
+                    time.sleep(1 + numofFail)
+            ser.write(cmd)
+            ZesLogger.log("TX " + cmd.hex(), "")
+            time.sleep(0.1)
+            # msg = ser.read(size=SERIAL_READ_BUFFER_SIZE)
+            line = ser.readline()
 
         if not line and USE_VIRTUAL_PAYLOAD:
             example = EXAMPLE_RESPONSE.get(cmd.hex()[0], '---')
@@ -296,6 +304,7 @@ class ZesAntarisOperator:
             for retry in range(MAX_RETRY):  # for each mblk
                 print(f'[Debug] >>>  Trying for the {retry+1} time....')
                 if needHRT:
+                    print(mythread.correlation_id)
                     cls.hard_reset(mythread)
                     needHRT = False
 
@@ -430,7 +439,7 @@ class ZesAntarisOperator:
             elif PLATFORM == "WINDOWS" and len(avail_memblks_str) > 0:
                 print("\n\n[Debug] >>> Ground Test Partially Passed, payload UART operations tested OK with emulated payload control (Power, RESET, STATUS). \n\n")
             else:
-                print("\n\n[Debug] >>> Ground Test not passed. \n\n")
+                print("\n\n[Debug] >>> Antaris Control Test passed. \n\n")
 
 
     @classmethod
