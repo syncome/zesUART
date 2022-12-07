@@ -51,7 +51,7 @@ APP_PATH="/workspace/"
 
 MODE_FILE="/opt/antaris/app/mode"
 
-
+ 
 
 
 #Default operation
