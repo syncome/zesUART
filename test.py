@@ -87,7 +87,6 @@ def zes_app_test(mode='ground'):
     fsms[4].start()
     fsms[4].join()
 
-
     AntarisCtrl.delete_channel_and_goodbye(channel)
 
 

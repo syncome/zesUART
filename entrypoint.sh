@@ -43,9 +43,21 @@
 #    and calll appropriate (developer provided binary/script) to
 #    do that mode of operation (i.e. run, upgrade, run in specific mode etc)
 
+
+UPLOADED_FILE_PATH="/workspace/"
+APP_PATH="/workspace/"
+
+
+
 MODE_FILE="/opt/antaris/app/mode"
+
+
+
+
 #Default operation
 OP="normal"
+
+echo OP
 
 start() {
 	# Check the mode file to determine what operation to run
@@ -57,13 +69,19 @@ start() {
 	case "${OP}" in
 		normal)
 		# Run Payload Application
-		echo "Launching Payload Application"
+		echo "Launching Payload Application..."
 		# <Launch your payload application from here>
+		cd "${APP_PATH}zesUART"
+    echo "${APP_PATH}zesUART"
+		python3 flightService.py
 		;;
 		upgrade)
 		# Upgrade Payload Application
 		echo "Upgrading Payload Application"
-		# <Inject code here to upgrade payload application>
+		UPGRADE_FILE="${UPLOADED_FILE_PATH}zesUART.zip"
+		unzip -o UPGRADE_FILE -d APP_PATH
+		cd "${APP_PATH}zesUART"
+		python3 flightService.py
 		;;
 		reset)
 		# Reset Payload Application

@@ -166,7 +166,6 @@ def antaris_satellite_status(mythread: FsmThread):
     mythread.condition.wait()
 
     # Tell PC that current sequence is done
-    AntarisCtrl.sequence_done(mythread.channel)
     mythread.state = "EXITING"
     print("sequence_a_fsm : state : ", mythread.state)
     mythread.condition.release()
@@ -239,7 +238,7 @@ def run_payload_in_flight_mode():
         if DEBUG: print(f'{fsms[1].seq_id} is not started yet, waiting PC to initialize and start')
         time.sleep(1)
 
-        # Wait for all FSM threads to complete
+    # Wait for all FSM threads to complete
     for key in fsms:
         if fsms[key].state != "NOT_STARTED":
             fsms[key].join()
@@ -249,19 +248,7 @@ def run_payload_in_flight_mode():
     fsms[4].start()
     fsms[4].join()
 
-    # DELETED IN VER 0.3
-    # # replace new file, at the end of task execution
-    # if newFileReceived and newFilePath:
-    #     path, filename = os.path.split(newFilePath)
-    #     zesAppPath = HOME_FOLDER_PATH + '/zesUART/'
-    #     payloadFilePath = zesAppPath + filename
-    #     shutil.copyfile(newFilePath, payloadFilePath)
-    #     with zipfile.ZipFile(payloadFilePath, 'r') as zip_ref:
-    #         zip_ref.extractall(zesAppPath)
-
-    AntarisCtrl.sequence_done(channel)
     AntarisCtrl.delete_channel_and_goodbye(channel)
-
 
 if __name__ == "__main__":
     run_payload_in_flight_mode()
