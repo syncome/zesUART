@@ -23,12 +23,12 @@ if PLATFORM == 'ANTARIS':
     GPIO_NRESET_PIN = "/dev/antaris/gpio13/value"  # GPIO output pin (as ZES_NRST in schematic)
     GPIO_FLAG_PIN = "/dev/antaris/gpio14/value"    # GPIO input pin (as ZES_FLAG in schematic)
 
-    HOME_FOLDER_PATH = "/home/ubuntu"            # the folder where this zesUART is placed in
+    HOME_FOLDER_PATH = "/workspace"            # the folder where this zesUART is placed in
 
     DEBUG = False
 
 elif PLATFORM == 'ANTARIS-DOCKER':
-    SERIAL_DEVICE = "/dev/cu.wchusbserial53220409041"                 # UART device endpoint
+    SERIAL_DEVICE = "/dev/ttyCH343USB0"                 # UART device endpoint
 
     GPIO_NRESET_PIN = "/workspace/dev/antaris/gpio13/value"  # GPIO output pin (as ZES_NRST in schematic)
     GPIO_FLAG_PIN = "/workspace/dev/antaris/gpio14/value"    # GPIO input pin (as ZES_FLAG in schematic)
@@ -36,8 +36,8 @@ elif PLATFORM == 'ANTARIS-DOCKER':
     HOME_FOLDER_PATH = "/workspace"            # the folder where this zesUART is placed in
 
     DEBUG = True
-    USE_VIRTUAL_HARDWARE_CTRL = True
     USE_VIRTUAL_PAYLOAD = True
+    USE_VIRTUAL_HARDWARE_CTRL = True
 
 elif PLATFORM == 'WINDOWS':
     '''

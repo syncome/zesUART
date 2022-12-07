@@ -15,6 +15,7 @@ from zesThread import FsmThread
 if PLATFORM == 'ANTARIS':
     from gpio_antaris import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
 elif PLATFORM == 'ANTARIS-DOCKER':
+    # from gpio_virtual import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
     from gpio_virtual import read_STATUS_pin, set_NRESET_pin
     if USE_VIRTUAL_HARDWARE_CTRL:
         from gpio_virtual import set_POWER_pin, get_POWER_state
@@ -99,6 +100,8 @@ class ZesAntarisOperator:
         return bitsStr
 
 
+    
+    
     def send_to_serial(cls, cmd):
         line = None
         if not USE_VIRTUAL_PAYLOAD:
@@ -439,7 +442,7 @@ class ZesAntarisOperator:
             elif PLATFORM == "WINDOWS" and len(avail_memblks_str) > 0:
                 print("\n\n[Debug] >>> Ground Test Partially Passed, payload UART operations tested OK with emulated payload control (Power, RESET, STATUS). \n\n")
             else:
-                print("\n\n[Debug] >>> Antaris Control Test passed. \n\n")
+                print("\n\n[Debug] >>> Ground Test not passed. \n\n")
 
 
     @classmethod
