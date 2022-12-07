@@ -72,14 +72,14 @@ start() {
 		echo "Launching Payload Application..."
 		# <Launch your payload application from here>
 		cd "${APP_PATH}zesUART"
-    echo "${APP_PATH}zesUART"
 		python3 flightService.py
 		;;
 		upgrade)
 		# Upgrade Payload Application
 		echo "Upgrading Payload Application"
 		UPGRADE_FILE="${UPLOADED_FILE_PATH}zesUART.zip"
-		unzip -o UPGRADE_FILE -d APP_PATH
+		unzip -o "${UPGRADE_FILE}" -d "${APP_PATH}"
+    rm "${UPGRADE_FILE}"
 		cd "${APP_PATH}zesUART"
 		python3 flightService.py
 		;;
@@ -87,6 +87,12 @@ start() {
 		# Reset Payload Application
 		echo "Resetting Payload Application"
 		# <Inject code here to reset payload application>
+    rm -r "${APP_PATH}zesUART"
+    UPGRADE_FILE="${UPLOADED_FILE_PATH}zesUART.zip"
+		unzip -o "${UPGRADE_FILE}" -d "${APP_PATH}"
+    rm "${UPGRADE_FILE}"
+		cd "${APP_PATH}zesUART"
+		python3 flightService.py
 		;;
 		*)
 		# Error
