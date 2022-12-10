@@ -44,14 +44,11 @@
 #    do that mode of operation (i.e. run, upgrade, run in specific mode etc)
 
 
-UPLOADED_FILE_PATH="/workspace/"
-APP_PATH="/workspace/"
-
-
+UPLOADED_FILE_PATH="/opt/antaris/inbound"
+APP_PATH="/opt/antaris/app"
 
 MODE_FILE="/opt/antaris/app/mode"
 
- 
 
 
 #Default operation

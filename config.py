@@ -18,12 +18,12 @@ Antaris Related Settings
 =========================================================
 '''
 if PLATFORM == 'ANTARIS':
-    SERIAL_DEVICE = "/dev/serial0"                 # UART device endpoint
+    SERIAL_DEVICE = "/dev/ttyUSB1"                 # UART device endpoint
 
-    GPIO_NRESET_PIN = "/dev/antaris/gpio13/value"  # GPIO output pin (as ZES_NRST in schematic)
-    GPIO_FLAG_PIN = "/dev/antaris/gpio14/value"    # GPIO input pin (as ZES_FLAG in schematic)
+    GPIO_NRESET_PIN = 5  # GPIO output pin (as ZES_NRST in schematic)
+    GPIO_FLAG_PIN = 6    # GPIO input pin (as ZES_FLAG in schematic)
 
-    HOME_FOLDER_PATH = "/workspace"            # the folder where this zesUART is placed in
+    HOME_FOLDER_PATH = "/opt/antaris/app"            # the folder where this zesUART is placed in
 
     DEBUG = False
 
