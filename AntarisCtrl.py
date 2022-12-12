@@ -16,6 +16,17 @@ class AntarisCtrl:
         api.api_pa_pc_payload_power_control(channel, params)
 
     @classmethod
+    def set_gpio_pin(cls, pin_number, value):
+        if DEBUG: print(f'[Sent] Pin {pin_number} = {value} \n\n')
+        isSuccess = api.api_pa_pc_write_gpio(pin_number, value)
+
+    @classmethod
+    def read_gpio_pin(cls, pin_number):
+        value = api.api_pa_pc_read_gpio(pin_number)
+        if DEBUG: print(f'[Sent] Read Pin {pin_number} = {value}... \n\n')
+        return value == '1' or value == 1
+
+    @classmethod
     def get_sat_location(cls, channel, correlation_id):
         if DEBUG: print('[Sent] get_sat_location, correlation_id=', correlation_id, '\n\n')
         api.api_pa_pc_get_current_location(channel, correlation_id)
