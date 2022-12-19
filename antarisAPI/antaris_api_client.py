@@ -15,12 +15,12 @@ import time
 import pdb
 
 import grpc
-import antaris_api_pb2
-import antaris_api_pb2_grpc
+from gen import antaris_api_pb2
+from gen import antaris_api_pb2_grpc
 import antaris_api_common as api_common
 
-import antaris_api_types as api_types
-import antaris_sdk_version as sdk_version
+from gen import antaris_api_types as api_types
+from gen import antaris_sdk_version as sdk_version
 
 api_debug = 0
 g_shutdown_grace_seconds=5
