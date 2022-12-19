@@ -26,8 +26,8 @@
 ###########################################################################
 
 
-import antaris_api_pb2
-import antaris_api_pb2_grpc
+from . import antaris_api_pb2
+from . import antaris_api_pb2_grpc
 
 # >>>> Data Types <<<<<
 
