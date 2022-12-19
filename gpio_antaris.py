@@ -1,5 +1,6 @@
 import datetime
 import threading
+import time
 
 from ZesLogger import ZesLogger
 from config import GPIO_NRESET_PIN, GPIO_FLAG_PIN
@@ -8,10 +9,14 @@ from zesThread import FsmThread
 
 
 def get_POWER_state(mythread: FsmThread):
-    AntarisCtrl.get_power_status(mythread.channel, mythread.correlation_id)
-    mythread.condition.acquire()
-    mythread.condition.wait()
-    return mythread.is_pl_power_on
+    # AntarisCtrl.get_power_status(mythread.channel, mythread.correlation_id)
+    # mythread.condition.acquire()
+    # mythread.condition.wait()
+    # return mythread.is_pl_power_on
+
+    # sleep 1s and then assume power is on
+    time.sleep(1)
+    return True
 
 
 def set_POWER_pin(mythread: FsmThread, on: bool):

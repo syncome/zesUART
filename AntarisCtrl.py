@@ -1,13 +1,13 @@
-from config import PLATFORM, USE_VIRTUAL_HARDWARE_CTRL
 import antarisAPI.antaris_api_client as api
 from antarisAPI.gen.antaris_api_types import *
+import antarisAPI.antaris_api_gpio as api_gpio
 from config import DEBUG
 
 class AntarisCtrl:
-    @classmethod
-    def get_power_status(cls, channel, correlation_id):
-        if DEBUG: print('[Sent] get_power_status, correlation_id=', correlation_id, '\n\n')
-        api.api_pa_pc_get_current_power_state(channel, correlation_id)
+    # @classmethod
+    # def get_power_status(cls, channel, correlation_id):
+    #     if DEBUG: print('[Sent] get_power_status, correlation_id=', correlation_id, '\n\n')
+    #     api.api_pa_pc_get_current_power_state(channel, correlation_id)
 
     @classmethod
     def set_power_pin(cls, channel, correlation_id, on=True):
@@ -18,13 +18,13 @@ class AntarisCtrl:
     @classmethod
     def set_gpio_pin(cls, pin_number, value):
         if DEBUG: print(f'[Sent] Pin {pin_number} = {value} \n\n')
-        isSuccess = api.api_pa_pc_write_gpio(pin_number, value)
+        isSuccess = api_gpio.api_pa_pc_write_gpio(pin_number, value)
 
     @classmethod
     def read_gpio_pin(cls, pin_number):
-        value = api.api_pa_pc_read_gpio(pin_number)
+        value = api_gpio.api_pa_pc_read_gpio(pin_number)
         if DEBUG: print(f'[Sent] Read Pin {pin_number} = {value}... \n\n')
-        return value == '1' or value == 1
+        return value == 1
 
     @classmethod
     def get_sat_location(cls, channel, correlation_id):
