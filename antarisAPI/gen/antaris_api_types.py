@@ -22,14 +22,12 @@
 
 #  Generated-From: antaris_api.xml
 
-#  Version: 0.0.1
-
 #
 ###########################################################################
 
 
-from antarisAPI.gen import antaris_api_pb2
-from antarisAPI.gen import antaris_api_pb2_grpc
+import antaris_api_pb2
+import antaris_api_pb2_grpc
 
 # >>>> Data Types <<<<<
 
@@ -41,9 +39,10 @@ class AntarisReturnCode:
     An_OUT_OF_RESOURCES = -3 # Not enough resources
     An_NOT_PERMITTED = -4 # Operation not allowed
     An_INVALID_PARAMS = -5 # Invalid parameter
+    An_INCOMPATIBLE_VERSION = -6 # Incompatible version of SDK invocation
 
 
-    reverse_dict = {0 : "An_SUCCESS", -1 : "An_GENERIC_FAILURE", -2 : "An_NOT_IMPLEMENTED", -3 : "An_OUT_OF_RESOURCES", -4 : "An_NOT_PERMITTED", -5 : "An_INVALID_PARAMS"}
+    reverse_dict = {0 : "An_SUCCESS", -1 : "An_GENERIC_FAILURE", -2 : "An_NOT_IMPLEMENTED", -3 : "An_OUT_OF_RESOURCES", -4 : "An_NOT_PERMITTED", -5 : "An_INVALID_PARAMS", -6 : "An_INCOMPATIBLE_VERSION"}
 
 
 
@@ -110,6 +109,30 @@ def peer_to_app_RespRegisterParams(peer_struct):
 def app_to_peer_RespRegisterParams(app_struct):
     return antaris_api_pb2.RespRegisterParams(correlation_id = app_struct.correlation_id, req_status = app_struct.req_status, auth_token = app_struct.auth_token)
 
+## @class: ReqGetCurrentLocationParams
+## @brief: Parameters for get current location request
+## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
+class ReqGetCurrentLocationParams:
+    def __init__(self, correlation_id):
+        self.correlation_id = correlation_id
+
+    def __str__(self):
+        ret_str = ""
+        ret_str += "correlation_id:\n"
+        ret_str += str(self.correlation_id) + "\n"
+
+        return ret_str
+
+    def display(self):
+        print(str(self))
+
+def peer_to_app_ReqGetCurrentLocationParams(peer_struct):
+    correlation_id = peer_struct.correlation_id
+    return ReqGetCurrentLocationParams(correlation_id)
+
+def app_to_peer_ReqGetCurrentLocationParams(app_struct):
+    return antaris_api_pb2.ReqGetCurrentLocationParams(correlation_id = app_struct.correlation_id)
+
 ## @class: RespGetCurrentLocationParams
 ## @brief: Response parameters for Get Location Flight Service
 ## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
@@ -117,15 +140,15 @@ def app_to_peer_RespRegisterParams(app_struct):
 ## @param: longitude                                       :    current latitude                                
 ## @param: latitude                                        :    current longitude                               
 ## @param: altitude                                        :    current altitude                                
-## @param: time_when_was_at_location                       :    time (seconds since epoch) when the location was determined
+## @param: determined_at                                   :    time (seconds since epoch) when the location was determined
 class RespGetCurrentLocationParams:
-    def __init__(self, correlation_id, req_status, longitude, latitude, altitude, time_when_was_at_location):
+    def __init__(self, correlation_id, req_status, longitude, latitude, altitude, determined_at):
         self.correlation_id = correlation_id
         self.req_status = req_status
         self.longitude = longitude
         self.latitude = latitude
         self.altitude = altitude
-        self.time_when_was_at_location = time_when_was_at_location
+        self.determined_at = determined_at
 
     def __str__(self):
         ret_str = ""
@@ -139,8 +162,8 @@ class RespGetCurrentLocationParams:
         ret_str += str(self.latitude) + "\n"
         ret_str += "altitude:\n"
         ret_str += str(self.altitude) + "\n"
-        ret_str += "time_when_was_at_location:\n"
-        ret_str += str(self.time_when_was_at_location) + "\n"
+        ret_str += "determined_at:\n"
+        ret_str += str(self.determined_at) + "\n"
 
         return ret_str
 
@@ -153,50 +176,16 @@ def peer_to_app_RespGetCurrentLocationParams(peer_struct):
     longitude = peer_struct.longitude
     latitude = peer_struct.latitude
     altitude = peer_struct.altitude
-    time_when_was_at_location = peer_struct.time_when_was_at_location
-    return RespGetCurrentLocationParams(correlation_id, req_status, longitude, latitude, altitude, time_when_was_at_location)
+    determined_at = peer_struct.determined_at
+    return RespGetCurrentLocationParams(correlation_id, req_status, longitude, latitude, altitude, determined_at)
 
 def app_to_peer_RespGetCurrentLocationParams(app_struct):
-    return antaris_api_pb2.RespGetCurrentLocationParams(correlation_id = app_struct.correlation_id, req_status = app_struct.req_status, longitude = app_struct.longitude, latitude = app_struct.latitude, altitude = app_struct.altitude, time_when_was_at_location = app_struct.time_when_was_at_location)
-
-## @class: RespGetCurrentPowerStateParams
-## @brief: Response parameters for Get Current Power-state Flight Service
-## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
-## @param: req_status                                      :    status of get-power-state request               
-## @param: power_state                                     :    current power state                             
-class RespGetCurrentPowerStateParams:
-    def __init__(self, correlation_id, req_status, power_state):
-        self.correlation_id = correlation_id
-        self.req_status = req_status
-        self.power_state = power_state
-
-    def __str__(self):
-        ret_str = ""
-        ret_str += "correlation_id:\n"
-        ret_str += str(self.correlation_id) + "\n"
-        ret_str += "req_status:\n"
-        ret_str += str(self.req_status) + "\n"
-        ret_str += "power_state:\n"
-        ret_str += str(self.power_state) + "\n"
-
-        return ret_str
-
-    def display(self):
-        print(str(self))
-
-def peer_to_app_RespGetCurrentPowerStateParams(peer_struct):
-    correlation_id = peer_struct.correlation_id
-    req_status = peer_struct.req_status
-    power_state = peer_struct.power_state
-    return RespGetCurrentPowerStateParams(correlation_id, req_status, power_state)
-
-def app_to_peer_RespGetCurrentPowerStateParams(app_struct):
-    return antaris_api_pb2.RespGetCurrentPowerStateParams(correlation_id = app_struct.correlation_id, req_status = app_struct.req_status, power_state = app_struct.power_state)
+    return antaris_api_pb2.RespGetCurrentLocationParams(correlation_id = app_struct.correlation_id, req_status = app_struct.req_status, longitude = app_struct.longitude, latitude = app_struct.latitude, altitude = app_struct.altitude, determined_at = app_struct.determined_at)
 
 ## @class: ReqStageFileDownloadParams
 ## @brief: Request parameters to stage file download
 ## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
-## @param: file_path                                       :    Path and filename in VM mapped directory (absolute or relative to mount-point)
+## @param: file_path                                       :    File path relative to outbound mount-point      
 class ReqStageFileDownloadParams:
     def __init__(self, correlation_id, file_path):
         self.correlation_id = correlation_id
@@ -254,7 +243,7 @@ def app_to_peer_RespStageFileDownloadParams(app_struct):
 ## @class: ReqPayloadPowerControlParams
 ## @brief: Request parameters for Payload Power Control
 ## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
-## @param: power_operation                                 :    Power operation : Power-Off (0), Power-On (1), Power-Cycle (2)
+## @param: power_operation                                 :    Power operation : Power-Off (0), Power-On (1)   
 class ReqPayloadPowerControlParams:
     def __init__(self, correlation_id, power_operation):
         self.correlation_id = correlation_id
@@ -381,11 +370,13 @@ def app_to_peer_RespHealthCheckParams(app_struct):
 ## @brief: Parameters for Start-Sequence Callback
 ## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
 ## @param: sequence_id                                     :    app-defined sequence-id for payload application to execute
+## @param: sequence_params                                 :    app-defined sequence parameters corresponding to the sequence-id
 ## @param: scheduled_deadline                              :    Epoch time till this sequence is allowed to run 
 class StartSequenceParams:
-    def __init__(self, correlation_id, sequence_id, scheduled_deadline):
+    def __init__(self, correlation_id, sequence_id, sequence_params, scheduled_deadline):
         self.correlation_id = correlation_id
         self.sequence_id = sequence_id
+        self.sequence_params = sequence_params
         self.scheduled_deadline = scheduled_deadline
 
     def __str__(self):
@@ -394,6 +385,8 @@ class StartSequenceParams:
         ret_str += str(self.correlation_id) + "\n"
         ret_str += "sequence_id:\n"
         ret_str += str(self.sequence_id) + "\n"
+        ret_str += "sequence_params:\n"
+        ret_str += str(self.sequence_params) + "\n"
         ret_str += "scheduled_deadline:\n"
         ret_str += str(self.scheduled_deadline) + "\n"
 
@@ -405,11 +398,12 @@ class StartSequenceParams:
 def peer_to_app_StartSequenceParams(peer_struct):
     correlation_id = peer_struct.correlation_id
     sequence_id = peer_struct.sequence_id
+    sequence_params = peer_struct.sequence_params
     scheduled_deadline = peer_struct.scheduled_deadline
-    return StartSequenceParams(correlation_id, sequence_id, scheduled_deadline)
+    return StartSequenceParams(correlation_id, sequence_id, sequence_params, scheduled_deadline)
 
 def app_to_peer_StartSequenceParams(app_struct):
-    return antaris_api_pb2.StartSequenceParams(correlation_id = app_struct.correlation_id, sequence_id = app_struct.sequence_id, scheduled_deadline = app_struct.scheduled_deadline)
+    return antaris_api_pb2.StartSequenceParams(correlation_id = app_struct.correlation_id, sequence_id = app_struct.sequence_id, sequence_params = app_struct.sequence_params, scheduled_deadline = app_struct.scheduled_deadline)
 
 ## @class: ShutdownParams
 ## @brief: Callback parameters notifying Application of imminent shutdown
@@ -439,35 +433,6 @@ def peer_to_app_ShutdownParams(peer_struct):
 
 def app_to_peer_ShutdownParams(app_struct):
     return antaris_api_pb2.ShutdownParams(correlation_id = app_struct.correlation_id, grace_time = app_struct.grace_time)
-
-## @class: PassthruCmdParams
-## @brief: Payload Application pass-through command parameters from Mission Control
-## @param: correlation_id                                  :    correlation id for matching requests with responses and callbacks
-## @param: passthru_cmd                                    :    application-specific opaque pass-through command as sent from mission-control
-class PassthruCmdParams:
-    def __init__(self, correlation_id, passthru_cmd):
-        self.correlation_id = correlation_id
-        self.passthru_cmd = passthru_cmd
-
-    def __str__(self):
-        ret_str = ""
-        ret_str += "correlation_id:\n"
-        ret_str += str(self.correlation_id) + "\n"
-        ret_str += "passthru_cmd:\n"
-        ret_str += str(self.passthru_cmd) + "\n"
-
-        return ret_str
-
-    def display(self):
-        print(str(self))
-
-def peer_to_app_PassthruCmdParams(peer_struct):
-    correlation_id = peer_struct.correlation_id
-    passthru_cmd = peer_struct.passthru_cmd
-    return PassthruCmdParams(correlation_id, passthru_cmd)
-
-def app_to_peer_PassthruCmdParams(app_struct):
-    return antaris_api_pb2.PassthruCmdParams(correlation_id = app_struct.correlation_id, passthru_cmd = app_struct.passthru_cmd)
 
 ## @class: HealthCheckParams
 ## @brief: HealthCheck message
@@ -521,22 +486,18 @@ def app_to_peer_CmdSequenceDoneParams(app_struct):
 ## @brief: Callback-functions registration structure for channel creation
 ## @param: start_sequence                                  :    callback handler for start-sequence             
 ## @param: shutdown_app                                    :    callback handler for shutdown-app               
-## @param: process_passthru_tele_cmd                       :    callback handler for pass-through tele-cmd      
 ## @param: process_health_check                            :    callback handler for health-check request from PC
 ## @param: process_response_register                       :    callback handler for registration response      
 ## @param: process_response_get_current_location           :    callback handler for current-location response  
-## @param: process_response_get_current_power_state        :    callback handler for current-power-state response
 ## @param: process_response_stage_file_download            :    callback handler for stage file download response
 ## @param: process_response_payload_power_control          :    callback handler for payload power control response
 class AntarisApiCallbackFuncList:
-    def __init__(self, start_sequence, shutdown_app, process_passthru_tele_cmd, process_health_check, process_response_register, process_response_get_current_location, process_response_get_current_power_state, process_response_stage_file_download, process_response_payload_power_control):
+    def __init__(self, start_sequence, shutdown_app, process_health_check, process_response_register, process_response_get_current_location, process_response_stage_file_download, process_response_payload_power_control):
         self.start_sequence = start_sequence
         self.shutdown_app = shutdown_app
-        self.process_passthru_tele_cmd = process_passthru_tele_cmd
         self.process_health_check = process_health_check
         self.process_response_register = process_response_register
         self.process_response_get_current_location = process_response_get_current_location
-        self.process_response_get_current_power_state = process_response_get_current_power_state
         self.process_response_stage_file_download = process_response_stage_file_download
         self.process_response_payload_power_control = process_response_payload_power_control
 
@@ -546,16 +507,12 @@ class AntarisApiCallbackFuncList:
         ret_str += str(self.start_sequence) + "\n"
         ret_str += "shutdown_app:\n"
         ret_str += str(self.shutdown_app) + "\n"
-        ret_str += "process_passthru_tele_cmd:\n"
-        ret_str += str(self.process_passthru_tele_cmd) + "\n"
         ret_str += "process_health_check:\n"
         ret_str += str(self.process_health_check) + "\n"
         ret_str += "process_response_register:\n"
         ret_str += str(self.process_response_register) + "\n"
         ret_str += "process_response_get_current_location:\n"
         ret_str += str(self.process_response_get_current_location) + "\n"
-        ret_str += "process_response_get_current_power_state:\n"
-        ret_str += str(self.process_response_get_current_power_state) + "\n"
         ret_str += "process_response_stage_file_download:\n"
         ret_str += str(self.process_response_stage_file_download) + "\n"
         ret_str += "process_response_payload_power_control:\n"
@@ -569,17 +526,15 @@ class AntarisApiCallbackFuncList:
 def peer_to_app_AntarisApiCallbackFuncList(peer_struct):
     start_sequence = peer_struct.start_sequence
     shutdown_app = peer_struct.shutdown_app
-    process_passthru_tele_cmd = peer_struct.process_passthru_tele_cmd
     process_health_check = peer_struct.process_health_check
     process_response_register = peer_struct.process_response_register
     process_response_get_current_location = peer_struct.process_response_get_current_location
-    process_response_get_current_power_state = peer_struct.process_response_get_current_power_state
     process_response_stage_file_download = peer_struct.process_response_stage_file_download
     process_response_payload_power_control = peer_struct.process_response_payload_power_control
-    return AntarisApiCallbackFuncList(start_sequence, shutdown_app, process_passthru_tele_cmd, process_health_check, process_response_register, process_response_get_current_location, process_response_get_current_power_state, process_response_stage_file_download, process_response_payload_power_control)
+    return AntarisApiCallbackFuncList(start_sequence, shutdown_app, process_health_check, process_response_register, process_response_get_current_location, process_response_stage_file_download, process_response_payload_power_control)
 
 def app_to_peer_AntarisApiCallbackFuncList(app_struct):
-    return antaris_api_pb2.AntarisApiCallbackFuncList(start_sequence = app_struct.start_sequence, shutdown_app = app_struct.shutdown_app, process_passthru_tele_cmd = app_struct.process_passthru_tele_cmd, process_health_check = app_struct.process_health_check, process_response_register = app_struct.process_response_register, process_response_get_current_location = app_struct.process_response_get_current_location, process_response_get_current_power_state = app_struct.process_response_get_current_power_state, process_response_stage_file_download = app_struct.process_response_stage_file_download, process_response_payload_power_control = app_struct.process_response_payload_power_control)
+    return antaris_api_pb2.AntarisApiCallbackFuncList(start_sequence = app_struct.start_sequence, shutdown_app = app_struct.shutdown_app, process_health_check = app_struct.process_health_check, process_response_register = app_struct.process_response_register, process_response_get_current_location = app_struct.process_response_get_current_location, process_response_stage_file_download = app_struct.process_response_stage_file_download, process_response_payload_power_control = app_struct.process_response_payload_power_control)
 
 ## @class: AntarisReturnType
 ## @brief: Wrapper structure for AntarisReturnCode

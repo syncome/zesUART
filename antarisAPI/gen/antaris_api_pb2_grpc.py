@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from antarisAPI.gen import antaris_api_pb2 as antaris__api__pb2
+import antaris_api_pb2 as antaris__api__pb2
 
 
 class AntarisapiApplicationCallbackStub(object):
@@ -24,11 +24,6 @@ class AntarisapiApplicationCallbackStub(object):
                 request_serializer=antaris__api__pb2.ShutdownParams.SerializeToString,
                 response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
                 )
-        self.PA_ProcessPassThruTeleCmd = channel.unary_unary(
-                '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessPassThruTeleCmd',
-                request_serializer=antaris__api__pb2.PassthruCmdParams.SerializeToString,
-                response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
-                )
         self.PA_ProcessHealthCheck = channel.unary_unary(
                 '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessHealthCheck',
                 request_serializer=antaris__api__pb2.HealthCheckParams.SerializeToString,
@@ -42,11 +37,6 @@ class AntarisapiApplicationCallbackStub(object):
         self.PA_ProcessResponseGetCurrentLocation = channel.unary_unary(
                 '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessResponseGetCurrentLocation',
                 request_serializer=antaris__api__pb2.RespGetCurrentLocationParams.SerializeToString,
-                response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
-                )
-        self.PA_ProcessResponseGetPowerstate = channel.unary_unary(
-                '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessResponseGetPowerstate',
-                request_serializer=antaris__api__pb2.RespGetCurrentPowerStateParams.SerializeToString,
                 response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
                 )
         self.PA_ProcessResponseStageFileDownload = channel.unary_unary(
@@ -76,12 +66,6 @@ class AntarisapiApplicationCallbackServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def PA_ProcessPassThruTeleCmd(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def PA_ProcessHealthCheck(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -95,12 +79,6 @@ class AntarisapiApplicationCallbackServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def PA_ProcessResponseGetCurrentLocation(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def PA_ProcessResponseGetPowerstate(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -131,11 +109,6 @@ def add_AntarisapiApplicationCallbackServicer_to_server(servicer, server):
                     request_deserializer=antaris__api__pb2.ShutdownParams.FromString,
                     response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
             ),
-            'PA_ProcessPassThruTeleCmd': grpc.unary_unary_rpc_method_handler(
-                    servicer.PA_ProcessPassThruTeleCmd,
-                    request_deserializer=antaris__api__pb2.PassthruCmdParams.FromString,
-                    response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
-            ),
             'PA_ProcessHealthCheck': grpc.unary_unary_rpc_method_handler(
                     servicer.PA_ProcessHealthCheck,
                     request_deserializer=antaris__api__pb2.HealthCheckParams.FromString,
@@ -149,11 +122,6 @@ def add_AntarisapiApplicationCallbackServicer_to_server(servicer, server):
             'PA_ProcessResponseGetCurrentLocation': grpc.unary_unary_rpc_method_handler(
                     servicer.PA_ProcessResponseGetCurrentLocation,
                     request_deserializer=antaris__api__pb2.RespGetCurrentLocationParams.FromString,
-                    response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
-            ),
-            'PA_ProcessResponseGetPowerstate': grpc.unary_unary_rpc_method_handler(
-                    servicer.PA_ProcessResponseGetPowerstate,
-                    request_deserializer=antaris__api__pb2.RespGetCurrentPowerStateParams.FromString,
                     response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
             ),
             'PA_ProcessResponseStageFileDownload': grpc.unary_unary_rpc_method_handler(
@@ -211,23 +179,6 @@ class AntarisapiApplicationCallback(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def PA_ProcessPassThruTeleCmd(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessPassThruTeleCmd',
-            antaris__api__pb2.PassthruCmdParams.SerializeToString,
-            antaris__api__pb2.AntarisReturnType.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def PA_ProcessHealthCheck(request,
             target,
             options=(),
@@ -274,23 +225,6 @@ class AntarisapiApplicationCallback(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessResponseGetCurrentLocation',
             antaris__api__pb2.RespGetCurrentLocationParams.SerializeToString,
-            antaris__api__pb2.AntarisReturnType.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def PA_ProcessResponseGetPowerstate(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/antaris_api_peer_to_peer.AntarisapiApplicationCallback/PA_ProcessResponseGetPowerstate',
-            antaris__api__pb2.RespGetCurrentPowerStateParams.SerializeToString,
             antaris__api__pb2.AntarisReturnType.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -346,12 +280,7 @@ class AntarisapiPayloadControllerStub(object):
                 )
         self.PC_get_current_location = channel.unary_unary(
                 '/antaris_api_peer_to_peer.AntarisapiPayloadController/PC_get_current_location',
-                request_serializer=antaris__api__pb2.AntarisCorrelationId.SerializeToString,
-                response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
-                )
-        self.PC_get_current_power_state = channel.unary_unary(
-                '/antaris_api_peer_to_peer.AntarisapiPayloadController/PC_get_current_power_state',
-                request_serializer=antaris__api__pb2.AntarisCorrelationId.SerializeToString,
+                request_serializer=antaris__api__pb2.ReqGetCurrentLocationParams.SerializeToString,
                 response_deserializer=antaris__api__pb2.AntarisReturnType.FromString,
                 )
         self.PC_stage_file_download = channel.unary_unary(
@@ -391,12 +320,6 @@ class AntarisapiPayloadControllerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def PC_get_current_location(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def PC_get_current_power_state(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -442,12 +365,7 @@ def add_AntarisapiPayloadControllerServicer_to_server(servicer, server):
             ),
             'PC_get_current_location': grpc.unary_unary_rpc_method_handler(
                     servicer.PC_get_current_location,
-                    request_deserializer=antaris__api__pb2.AntarisCorrelationId.FromString,
-                    response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
-            ),
-            'PC_get_current_power_state': grpc.unary_unary_rpc_method_handler(
-                    servicer.PC_get_current_power_state,
-                    request_deserializer=antaris__api__pb2.AntarisCorrelationId.FromString,
+                    request_deserializer=antaris__api__pb2.ReqGetCurrentLocationParams.FromString,
                     response_serializer=antaris__api__pb2.AntarisReturnType.SerializeToString,
             ),
             'PC_stage_file_download': grpc.unary_unary_rpc_method_handler(
@@ -514,24 +432,7 @@ class AntarisapiPayloadController(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/antaris_api_peer_to_peer.AntarisapiPayloadController/PC_get_current_location',
-            antaris__api__pb2.AntarisCorrelationId.SerializeToString,
-            antaris__api__pb2.AntarisReturnType.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def PC_get_current_power_state(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/antaris_api_peer_to_peer.AntarisapiPayloadController/PC_get_current_power_state',
-            antaris__api__pb2.AntarisCorrelationId.SerializeToString,
+            antaris__api__pb2.ReqGetCurrentLocationParams.SerializeToString,
             antaris__api__pb2.AntarisReturnType.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -12,17 +12,20 @@ permitted to use this software.
 from concurrent import futures
 import logging
 import time
+import pdb
 
-import grpc   # TODO: what is this grpc?   pip install grpcio
-from antarisAPI.gen import antaris_api_pb2
-from antarisAPI.gen import antaris_api_pb2_grpc
-from antarisAPI import antaris_api_common as api_common
+import grpc
+import antaris_api_pb2
+import antaris_api_pb2_grpc
+import antaris_api_common as api_common
 
-from antarisAPI.gen import antaris_api_types as api_types
+import antaris_api_types as api_types
+import antaris_sdk_version as sdk_version
 
 api_debug = 0
 g_shutdown_grace_seconds=5
 g_shutdown_grace_for_grace=2
+g_ANTARIS_CALLBACK_GRACE_DELAY=10
 
 class AntarisChannel:
     def __init__(self, grpc_client_handle, grpc_server_handle, pc_to_app_server, is_secure, callback_func_list):
@@ -32,11 +35,9 @@ class AntarisChannel:
         self.is_secure = is_secure
         self.start_sequence = callback_func_list['StartSequence']
         self.shutdown_app = callback_func_list['Shutdown']
-        self.process_passthru_cmd = callback_func_list['PassthruCmd']
         self.process_health_check = callback_func_list['HealthCheck']
         self.process_resp_register = callback_func_list['RespRegister']
         self.process_resp_get_curr_location = callback_func_list['RespGetCurrentLocation']
-        self.process_resp_get_curr_power_state = callback_func_list['RespGetCurrentPowerState']
         self.process_resp_stage_file_download = callback_func_list['RespStageFileDownload']
         self.process_resp_payload_power_control = callback_func_list['RespPayloadPowerControl']
 
@@ -56,14 +57,6 @@ class PCToAppService(antaris_api_pb2_grpc.AntarisapiApplicationCallbackServicer)
         if self.channel.shutdown_app:
             app_request = api_types.peer_to_app_ShutdownParams(request)
             app_ret = self.channel.shutdown_app(app_request)
-            return antaris_api_pb2.AntarisReturnType(return_code = app_ret)
-        else:
-            return antaris_api_pb2.AntarisReturnType(return_code = api_types.AntarisReturnCode.An_NOT_IMPLEMENTED)
-
-    def PA_ProcessPassThruTeleCmd(self, request, context):
-        if self.channel.process_passthru_cmd:
-            app_request = api_types.peer_to_app_PassthruCmdParams(request)
-            app_ret = self.channel.process_passthru_cmd(app_request)
             return antaris_api_pb2.AntarisReturnType(return_code = app_ret)
         else:
             return antaris_api_pb2.AntarisReturnType(return_code = api_types.AntarisReturnCode.An_NOT_IMPLEMENTED)
@@ -92,14 +85,6 @@ class PCToAppService(antaris_api_pb2_grpc.AntarisapiApplicationCallbackServicer)
         else:
             return antaris_api_pb2.AntarisReturnType(return_code = api_types.AntarisReturnCode.An_NOT_IMPLEMENTED)
 
-    def PA_ProcessResponseGetPowerstate(self, request, context):
-        if self.channel.process_resp_get_curr_power_state:
-            app_request = api_types.peer_to_app_RespGetCurrentPowerStateParams(request)
-            app_ret = self.channel.process_resp_get_curr_power_state(app_request)
-            return antaris_api_pb2.AntarisReturnType(return_code = app_ret)
-        else:
-            return antaris_api_pb2.AntarisReturnType(return_code = api_types.AntarisReturnCode.An_NOT_IMPLEMENTED)
-
     def PA_ProcessResponseStageFileDownload(self, request, context):
         if self.channel.process_resp_stage_file_download:
             app_request = api_types.peer_to_app_RespStageFileDownloadParams(request)
@@ -117,16 +102,28 @@ class PCToAppService(antaris_api_pb2_grpc.AntarisapiApplicationCallbackServicer)
             return antaris_api_pb2.AntarisReturnType(return_code = api_types.AntarisReturnCode.An_NOT_IMPLEMENTED)
 
 def api_pa_pc_create_channel_common(secure, callback_func_list):
+    global g_ANTARIS_CALLBACK_GRACE_DELAY
+    pc_endpoint = "{}:{}".format(api_common.g_PAYLOAD_CONTROLLER_IP, api_common.g_PC_GRPC_SERVER_PORT)
+    app_endpoint = "{}:{}".format(api_common.g_LISTEN_IP, api_common.g_PA_GRPC_SERVER_PORT)
+
     print("api_pa_pc_create_channel_common")
 
-    client_handle = antaris_api_pb2_grpc.AntarisapiPayloadControllerStub(grpc.insecure_channel("{}:{}".format(api_common.LISTEN_IP, api_common.SERVER_GRPC_PORT)))
+    is_endpoint_free = api_common.is_server_endpoint_available(api_common.g_LISTEN_IP, int(api_common.g_PA_GRPC_SERVER_PORT))
+
+    if not is_endpoint_free:
+        print("Callback endpoint {} is not free".format(app_endpoint))
+        return None
+
+    client_handle = antaris_api_pb2_grpc.AntarisapiPayloadControllerStub(grpc.insecure_channel(pc_endpoint))
+
     server_handle =  grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    server_handle.add_insecure_port("{}:{}".format(api_common.LISTEN_IP, api_common.APP_GRPC_CALLBACK_PORT))
+    server_handle.add_insecure_port(app_endpoint)
     pc_to_app_server = PCToAppService()
     antaris_api_pb2_grpc.add_AntarisapiApplicationCallbackServicer_to_server(pc_to_app_server, server_handle)
     channel = AntarisChannel(client_handle, server_handle, pc_to_app_server, secure, callback_func_list)
     pc_to_app_server.set_channel(channel)
     server_handle.start()
+    time.sleep(g_ANTARIS_CALLBACK_GRACE_DELAY)
 
     print("started callback server and created channel")
 
@@ -153,10 +150,19 @@ def api_pa_pc_delete_channel(channel):
     return 0
 
 def api_pa_pc_register(channel, register_params):
-    print("api_pa_pc_register")
+    print("api_pa_pc_registering with SDK version {}.{}.{}".
+                format(
+                    sdk_version.ANTARIS_PA_PC_SDK_MAJOR_VERSION,
+                    sdk_version.ANTARIS_PA_PC_SDK_MINOR_VERSION,
+                    sdk_version.ANTARIS_PA_PC_SDK_PATCH_VERSION))
+
     if (api_debug):
         register_params.display()
     peer_params = api_types.app_to_peer_ReqRegisterParams(register_params)
+
+    peer_params.sdk_version.major = sdk_version.ANTARIS_PA_PC_SDK_MAJOR_VERSION
+    peer_params.sdk_version.minor = sdk_version.ANTARIS_PA_PC_SDK_MINOR_VERSION
+    peer_params.sdk_version.patch = sdk_version.ANTARIS_PA_PC_SDK_PATCH_VERSION
 
     peer_ret = channel.grpc_client_handle.PC_register(peer_params)
 
@@ -165,20 +171,14 @@ def api_pa_pc_register(channel, register_params):
 
     return peer_ret.return_code
 
-def api_pa_pc_get_current_location(channel, correlation_id):
-    print("api_pa_pc_get_curent_location: correlation_id : ", correlation_id)
-
-    peer_ret = channel.grpc_client_handle.PC_get_current_location(antaris_api_pb2.AntarisCorrelationId(correlation_id = correlation_id))
-
+def api_pa_pc_get_current_location(channel, get_location_params):
+    print("api_pa_pc_get_curent_location")
     if (api_debug):
-        print("Got return code {} => {}".format(peer_ret.return_code, api_types.AntarisReturnCode.reverse_dict[peer_ret.return_code]))
+        get_location_params.display()
 
-    return peer_ret.return_code
+    peer_params = api_types.app_to_peer_ReqGetCurrentLocationParams(get_location_params)
 
-def api_pa_pc_get_current_power_state(channel, correlation_id):
-    print("api_pa_pc_get_current_power_state")
-
-    peer_ret = channel.grpc_client_handle.PC_get_current_power_state(antaris_api_pb2.AntarisCorrelationId(correlation_id = correlation_id))
+    peer_ret = channel.grpc_client_handle.PC_get_current_location(peer_params)
 
     if (api_debug):
         print("Got return code {} => {}".format(peer_ret.return_code, api_types.AntarisReturnCode.reverse_dict[peer_ret.return_code]))
