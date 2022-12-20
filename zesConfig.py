@@ -1,5 +1,5 @@
 from config import *
-
+import os
 
 TASK_PERIODIC_SECONDS = 10 * 60
 
@@ -38,6 +38,10 @@ Cycle_Loc = (110, 119)
 OpCode_Loc = (120, 127)
 
 LOG_FILE_PATH = HOME_FOLDER_PATH + "/zesUART/log/"
+if not os.path.exists(LOG_FILE_PATH):
+    os.makedirs(LOG_FILE_PATH)
+    print("Log folder created.")
+
 LOG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 MAX_WRITE_FAIL_RETRY = 3

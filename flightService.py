@@ -81,6 +81,7 @@ def process_reponse_point_to_target(resp_point_to_target_param):
 
 
 def process_response_get_current_location(param: RespGetCurrentLocationParams):
+    param.display()
     if DEBUG: print('[Received] process_response_get_current_location:', param)
     ZesLogger.log(cmdStr='LOC', dataStr=f'Lon:{param.longitude}, Lat:{param.latitude}, Alt:{param.altitude}')
     correlation_id = param.correlation_id
@@ -158,8 +159,8 @@ def antaris_satellite_status(mythread: FsmThread):
     # mythread.state = "WAITING_FOR_GET_TIME"
     # mythread.condition.acquire()
     # mythread.condition.wait()
-
-    AntarisCtrl.get_sat_location(mythread.channel, mythread.correlation_id)
+    get_location_params = ReqGetCurrentLocationParams(mythread.correlation_id)
+    AntarisCtrl.get_sat_location(mythread.channel, get_location_params)
     mythread.correlation_id += 1
     mythread.state = "WAITING_FOR_GET_SAT_LOCATION"
     mythread.condition.acquire()

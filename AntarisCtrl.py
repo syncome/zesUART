@@ -28,9 +28,9 @@ class AntarisCtrl:
         return value == 1
 
     @classmethod
-    def get_sat_location(cls, channel, correlation_id):
-        if DEBUG: print('[Sent] get_sat_location, correlation_id=', correlation_id, '\n\n')
-        api.api_pa_pc_get_current_location(channel, correlation_id)
+    def get_sat_location(cls, channel, get_location_params):
+        if DEBUG: print('[Sent] get_sat_location, get_location_params=', get_location_params.display(), '\n\n')
+        api.api_pa_pc_get_current_location(channel, get_location_params)
 
     @classmethod
     def create_secure_channel(cls, callback_func_list):
