@@ -24,7 +24,7 @@ import zipfile
 fsms = dict()
 
 power_status = 0
-
+channel = None
 
 
 
@@ -48,7 +48,19 @@ def wakeup_seq_fsm(correlation_id: int):
 
 def shutdown_app(shutdown_param: ShutdownParams):
     if DEBUG: print('[Received] shutdown_param:', shutdown_param)
-    pass
+    print("shutdown_app : Got shutdown request from PC")
+
+    #<Payload Application Business Logic>
+    # 1. Shutdown Payload Hardware
+    # 2. Do whatever is required to be done before shutting down the application
+
+    shutdown_requested = 1
+
+    # Respond back to Payload Controller about Shutdown completion
+    print("Completed shutdown, responding back to PC")
+        
+    AntarisCtrl.shutdown_app()
+    wakeup_seq_fsm(shutdown_param.correlation_id)
 
 def start_sequence(start_seq_param: StartSequenceParams):
     if DEBUG: print('[Received] start_seq_param:', start_seq_param)
@@ -141,19 +153,18 @@ def start_zes_app(mythread: FsmThread):
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
     mythread.state = "EXISTING"
-    mythread.condition.release()
-
 
 def monitor_zes_FLAG(mythread: FsmThread):
     mythread.state = "STARTED"
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
     mythread.state = "EXISTING"
-    mythread.condition.release()
+
 
 
 def antaris_satellite_status(mythread: FsmThread):
     mythread.state = "STARTED"
+    print("=================================================Started satellite status")
 
     # AntarisCtrl.get_controller_time(mythread.channel, mythread.correlation_id)
     # mythread.correlation_id += 1
@@ -243,13 +254,15 @@ def run_payload_in_flight_mode():
 
     # Wait for all FSM threads to complete
     for key in fsms:
+        print("xxxxxxxxxxxxxxxxxxxxx", fsms[key].state)
         if fsms[key].state != "NOT_STARTED":
             fsms[key].join()
+    print('Joined')
 
-    # all threads completed, logging finished.  Download file to ground station if necessary
-    fsms[4] = FsmThread(channel, 4, 40000, 'ZES_Download_Log', download_logfile_to_groundstation)
-    fsms[4].start()
-    fsms[4].join()
+    # # all threads completed, logging finished.  Download file to ground station if necessary
+    # fsms[4] = FsmThread(channel, 4, 40000, 'ZES_Download_Log', download_logfile_to_groundstation)
+    # fsms[4].start()
+    # fsms[4].join()
 
     AntarisCtrl.delete_channel_and_goodbye(channel)
 

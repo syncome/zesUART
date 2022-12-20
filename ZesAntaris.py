@@ -532,3 +532,5 @@ class ZesAntarisOperator:
             ZesLogger.log(cmdStr='SYS', dataStr=f'Read Checkk Operation A failed {MAX_RETRY} times, aborting')
         else:
             if DEBUG: print('[Debug] >>> Flight Operation Completed.')
+            ZesLogger.log(cmdStr='SYS', dataStr=f'One-time flight mode completed.')
+
