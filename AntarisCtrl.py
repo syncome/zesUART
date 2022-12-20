@@ -1,6 +1,5 @@
 import antarisAPI.antaris_api_client as api
 from antarisAPI.gen.antaris_api_types import *
-import antarisAPI.antaris_api_gpio as api_gpio
 from config import DEBUG
 
 class AntarisCtrl:
@@ -17,11 +16,13 @@ class AntarisCtrl:
 
     @classmethod
     def set_gpio_pin(cls, pin_number, value):
+        import antarisAPI.antaris_api_gpio as api_gpio
         if DEBUG: print(f'[Sent] Pin {pin_number} = {value} \n\n')
         isSuccess = api_gpio.api_pa_pc_write_gpio(pin_number, value)
 
     @classmethod
     def read_gpio_pin(cls, pin_number):
+        import antarisAPI.antaris_api_gpio as api_gpio
         value = api_gpio.api_pa_pc_read_gpio(pin_number)
         if DEBUG: print(f'[Sent] Read Pin {pin_number} = {value}... \n\n')
         return value == 1

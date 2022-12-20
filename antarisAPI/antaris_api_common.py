@@ -9,7 +9,7 @@ entered into the Antaris SDK License Agreement, you are not
 permitted to use this software.
 """
 
-import antaris_sdk_environment as environment
+from . import antaris_sdk_environment as environment
 import pdb
 import socket
 

@@ -4,9 +4,9 @@ from ZesAntaris import ZesAntarisOperator
 from zesThread import FsmThread
 from AntarisCtrl import AntarisCtrl
 import time, os, shutil, zipfile
-from flightService import shutdown_app, process_passthru_tele_cmd, process_health_check, \
+from flightService import shutdown_app, process_health_check, \
     process_response_register, process_reponse_point_to_target, process_response_get_current_location, \
-    process_response_get_current_power_state, process_response_download_file_to_gs, \
+    process_response_download_file_to_gs, \
     process_response_payload_power_control, download_logfile_to_groundstation, run_payload_in_flight_mode
 
 from flightService import fsms
@@ -43,14 +43,14 @@ def zes_app_test(mode='ground'):
     callback_func_list = {
         'StartSequence': start_test_sequence,
         'Shutdown': shutdown_app,
-        'PassthruCmd': process_passthru_tele_cmd,
+        # 'PassthruCmd': process_passthru_tele_cmd,
         # 'NewFileUploaded': process_new_file_uploaded,
         'HealthCheck': process_health_check,
         'RespRegister': process_response_register,
         # 'RespPointToTarget': process_reponse_point_to_target,
         'RespGetCurrentLocation': process_response_get_current_location,
         # 'RespGetCurrentTime': process_response_get_current_time,
-        'RespGetCurrentPowerState': process_response_get_current_power_state,
+        # 'RespGetCurrentPowerState': process_response_get_current_power_state,
         'RespStageFileDownload': process_response_download_file_to_gs,
         'RespPayloadPowerControl': process_response_payload_power_control,
     }

@@ -58,10 +58,10 @@ def start_sequence(start_seq_param: StartSequenceParams):
         fsms[key].start()
 
 
-def process_passthru_tele_cmd(param: PassthruCmdParams):
-    if DEBUG: print('[Received] process_passthru_tele_cmd:', param)
-    cmd = param.passthru_cmd
-    pass
+# def process_passthru_tele_cmd(param: PassthruCmdParams):
+#    if DEBUG: print('[Received] process_passthru_tele_cmd:', param)
+#    cmd = param.passthru_cmd
+#    pass
 
 # DELETED in ver 0.3
 # def process_new_file_uploaded(param: NewFileUploadedParams):
@@ -94,12 +94,12 @@ def process_response_get_current_location(param: RespGetCurrentLocationParams):
 #     wakeup_seq_fsm(correlation_id)
 
 
-def process_response_get_current_power_state(param: RespGetCurrentPowerStateParams):
-    if DEBUG: print("[Received] process_response_get_current_power_state : ", param)
-    correlation_id = param.correlation_id
-    relatedThread = get_thread_by(correlation_id)
-    relatedThread.is_pl_power_on = param.power_state == "ON"   # TODO: Check and verify
-    wakeup_seq_fsm(correlation_id)
+# def process_response_get_current_power_state(param: RespGetCurrentPowerStateParams):
+#    if DEBUG: print("[Received] process_response_get_current_power_state : ", param)
+#    correlation_id = param.correlation_id
+#    relatedThread = get_thread_by(correlation_id)
+#    relatedThread.is_pl_power_on = param.power_state == "ON"   # TODO: Check and verify
+#    wakeup_seq_fsm(correlation_id)
 
 
 def process_response_download_file_to_gs(param: RespStageFileDownloadParams):
@@ -204,14 +204,14 @@ def run_payload_in_flight_mode():
     callback_func_list = {
         'StartSequence': start_sequence,
         'Shutdown': shutdown_app,
-        'PassthruCmd': process_passthru_tele_cmd,
+        # 'PassthruCmd': process_passthru_tele_cmd,
         # 'NewFileUploaded': process_new_file_uploaded,
         'HealthCheck': process_health_check,
         'RespRegister': process_response_register,
         # 'RespPointToTarget': process_reponse_point_to_target,
         'RespGetCurrentLocation': process_response_get_current_location,
         # 'RespGetCurrentTime': process_response_get_current_time,
-        'RespGetCurrentPowerState': process_response_get_current_power_state,
+        # 'RespGetCurrentPowerState': process_response_get_current_power_state,
         'RespStageFileDownload': process_response_download_file_to_gs,
         'RespPayloadPowerControl': process_response_payload_power_control,
     }
