@@ -81,9 +81,8 @@ def process_reponse_point_to_target(resp_point_to_target_param):
 
 
 def process_response_get_current_location(param: RespGetCurrentLocationParams):
-    param.display()
     if DEBUG: print('[Received] process_response_get_current_location:', param)
-    ZesLogger.log(cmdStr='LOC', dataStr=f'Lon:{param.longitude}, Lat:{param.latitude}, Alt:{param.altitude}')
+    ZesLogger.log(cmdStr='LOC', dataStr=f'Lon:{param.longitude}, Lat:{param.latitude}, Alt:{param.altitude}, Det:{param.determined_at}')
     correlation_id = param.correlation_id
     wakeup_seq_fsm(correlation_id)
 
@@ -139,16 +138,18 @@ def start_zes_app(mythread: FsmThread):
     mythread.state = "STARTED"
     ZesAntarisOperator.power_on_and_prepare_payload_if_necessary(mythread)
     ZesAntarisOperator.one_time_flight_service_mode(mythread)
-    mythread.state = "EXISTING"
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+    mythread.state = "EXISTING"
+    mythread.condition.release()
 
 
 def monitor_zes_FLAG(mythread: FsmThread):
     mythread.state = "STARTED"
 
+    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
     mythread.state = "EXISTING"
-    pass
+    mythread.condition.release()
 
 
 def antaris_satellite_status(mythread: FsmThread):
@@ -167,11 +168,12 @@ def antaris_satellite_status(mythread: FsmThread):
     mythread.condition.wait()
 
     # Tell PC that current sequence is done
-    mythread.state = "EXITING"
-    print("sequence_a_fsm : state : ", mythread.state)
-    mythread.condition.release()
+
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+
+    mythread.state = "EXITING"
+    mythread.condition.release()
 
 
 
