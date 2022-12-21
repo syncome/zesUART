@@ -84,7 +84,7 @@ start() {
 		# Reset Payload Application
 		echo "Resetting Payload Application"
 		# <Inject code here to reset payload application>
-    		rm -r "${APP_PATH}zesUART"
+    		rm -rf "${APP_PATH}zesUART"
     		UPGRADE_FILE="${UPLOADED_FILE_PATH}zesUART.zip"
 		unzip -o "${UPGRADE_FILE}" -d "${APP_PATH}"
     		rm "${UPGRADE_FILE}"
