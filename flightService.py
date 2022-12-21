@@ -60,7 +60,7 @@ def shutdown_app(shutdown_param: ShutdownParams):
     print("Completed shutdown, responding back to PC")
         
     AntarisCtrl.shutdown_app()
-    wakeup_seq_fsm(shutdown_param.correlation_id)
+
 
 def start_sequence(start_seq_param: StartSequenceParams):
     if DEBUG: print('[Received] start_seq_param:', start_seq_param)
@@ -68,19 +68,6 @@ def start_sequence(start_seq_param: StartSequenceParams):
     global fsms
     for key in fsms:
         fsms[key].start()
-
-
-# def process_passthru_tele_cmd(param: PassthruCmdParams):
-#    if DEBUG: print('[Received] process_passthru_tele_cmd:', param)
-#    cmd = param.passthru_cmd
-#    pass
-
-# DELETED in ver 0.3
-# def process_new_file_uploaded(param: NewFileUploadedParams):
-#     newFileReceived = True
-#     filepath = param.file_path
-#     if DEBUG: print(f"New file uploaded at: {filepath}")
-
 
 def process_response_register(param: RespRegisterParams):
     if DEBUG: print('[Received] process_response_register:', param)
@@ -96,27 +83,19 @@ def process_response_get_current_location(param: RespGetCurrentLocationParams):
     if DEBUG: print('[Received] process_response_get_current_location:', param)
     ZesLogger.log(cmdStr='LOC', dataStr=f'Lon:{param.longitude}, Lat:{param.latitude}, Alt:{param.altitude}, Det:{param.determined_at}')
     correlation_id = param.correlation_id
+    if correlation_id != 30000:
+        print('[ZES Warning] Before patch process_response_get_current_location: correlation_id=', correlation_id)
+        correlation_id = 30000
+        print('[ZES Warning] After patch process_response_get_current_location: correlation_id=', correlation_id)
     wakeup_seq_fsm(correlation_id)
-
-
-# DELETED IN VER 0.3
-# def process_response_get_current_time(param: RespGetCurrentTimeParams):
-#     ZesLogger.log(cmdStr='TIM', dataStr=f'Ctl Tm:{param.epoch_time}, Sys Tm:{time.time()}')
-#     correlation_id = param.correlation_id
-#     wakeup_seq_fsm(correlation_id)
-
-
-# def process_response_get_current_power_state(param: RespGetCurrentPowerStateParams):
-#    if DEBUG: print("[Received] process_response_get_current_power_state : ", param)
-#    correlation_id = param.correlation_id
-#    relatedThread = get_thread_by(correlation_id)
-#    relatedThread.is_pl_power_on = param.power_state == "ON"   # TODO: Check and verify
-#    wakeup_seq_fsm(correlation_id)
-
 
 def process_response_download_file_to_gs(param: RespStageFileDownloadParams):
     if DEBUG: print("[Received] process_response_download_file_to_gs : ", param)
     correlation_id = param.correlation_id
+    if correlation_id != 40000:
+        print('[ZES Warning] Before patch process_response_download_file_to_gs: correlation_id=', correlation_id)
+        correlation_id = 40000
+        print('[ZES Warning] After patch process_response_download_file_to_gs: correlation_id=', correlation_id)
     isSuccess = param.req_status == 0
     relatedThread = get_thread_by(correlation_id)
     if relatedThread:
@@ -135,8 +114,10 @@ def process_health_check(health_check_param: RespHealthCheckParams):
 def process_response_payload_power_control(param: RespPayloadPowerControlParams):
     if DEBUG: print("[Received] RespPayloadPowerControlParams = ", param)
     correlation_id = param.correlation_id
-    # if correlation_id == 0:
-    #     correlation_id = 10000
+    if correlation_id != 10000:
+        print('[ZES Warning] Before patch process_response_payload_power_control: correlation_id=', correlation_id)
+        correlation_id = 10000
+        print('[ZES Warning] After patch process_response_payload_power_control: correlation_id=', correlation_id)
     relatedThread = get_thread_by(correlation_id)
     if relatedThread.will_power_on is not None:
         relatedThread.is_pl_power_on = relatedThread.will_power_on
@@ -164,13 +145,7 @@ def monitor_zes_FLAG(mythread: FsmThread):
 
 def antaris_satellite_status(mythread: FsmThread):
     mythread.state = "STARTED"
-    print("=================================================Started satellite status")
-
-    # AntarisCtrl.get_controller_time(mythread.channel, mythread.correlation_id)
-    # mythread.correlation_id += 1
-    # mythread.state = "WAITING_FOR_GET_TIME"
-    # mythread.condition.acquire()
-    # mythread.condition.wait()
+    
     get_location_params = ReqGetCurrentLocationParams(mythread.correlation_id)
     AntarisCtrl.get_sat_location(mythread.channel, get_location_params)
     mythread.correlation_id += 1
@@ -178,12 +153,9 @@ def antaris_satellite_status(mythread: FsmThread):
     mythread.condition.acquire()
     mythread.condition.wait()
 
-    # Tell PC that current sequence is done
-
-
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
 
-    mythread.state = "EXITING"
+    mythread.state = "EXISTING"
     mythread.condition.release()
 
 
@@ -207,9 +179,9 @@ def download_logfile_to_groundstation(mythread: FsmThread):
             print('Can not download file')
 
     ZesLogger.clean_old_files()
-    mythread.state = "EXISTING"
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+    mythread.state = "EXISTING"
 
 
 def run_payload_in_flight_mode():
@@ -218,14 +190,9 @@ def run_payload_in_flight_mode():
     callback_func_list = {
         'StartSequence': start_sequence,
         'Shutdown': shutdown_app,
-        # 'PassthruCmd': process_passthru_tele_cmd,
-        # 'NewFileUploaded': process_new_file_uploaded,
         'HealthCheck': process_health_check,
         'RespRegister': process_response_register,
-        # 'RespPointToTarget': process_reponse_point_to_target,
         'RespGetCurrentLocation': process_response_get_current_location,
-        # 'RespGetCurrentTime': process_response_get_current_time,
-        # 'RespGetCurrentPowerState': process_response_get_current_power_state,
         'RespStageFileDownload': process_response_download_file_to_gs,
         'RespPayloadPowerControl': process_response_payload_power_control,
     }
@@ -235,7 +202,7 @@ def run_payload_in_flight_mode():
     # Create Channel to talk to Payload Controller (PC)
     channel = AntarisCtrl.create_insecure_channel(callback_func_list)
 
-    if DEBUG: time.sleep(2)  # wait emulated PC to start
+    # if DEBUG: time.sleep(2)  # wait emulated PC to start
 
     if channel == None:
         print("Error : Create Channel failed")
@@ -254,15 +221,15 @@ def run_payload_in_flight_mode():
 
     # Wait for all FSM threads to complete
     for key in fsms:
-        print("xxxxxxxxxxxxxxxxxxxxx", fsms[key].state)
+        print("FSMS Key: ", key, "status", fsms[key].state)
         if fsms[key].state != "NOT_STARTED":
             fsms[key].join()
     print('Joined')
 
-    # # all threads completed, logging finished.  Download file to ground station if necessary
-    # fsms[4] = FsmThread(channel, 4, 40000, 'ZES_Download_Log', download_logfile_to_groundstation)
-    # fsms[4].start()
-    # fsms[4].join()
+    # all threads completed, logging finished.  Download file to ground station if necessary
+    fsms[4] = FsmThread(channel, 4, 40000, 'ZES_Download_Log', download_logfile_to_groundstation)
+    fsms[4].start()
+    fsms[4].join()
 
     AntarisCtrl.delete_channel_and_goodbye(channel)
 

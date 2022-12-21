@@ -29,7 +29,7 @@ class AntarisCtrl:
 
     @classmethod
     def get_sat_location(cls, channel, get_location_params):
-        if DEBUG: print('[Sent] get_sat_location, get_location_params=', get_location_params.display(), '\n\n')
+        if DEBUG: print('[Sent] get_sat_location, get_location_params=', get_location_params, '\n\n')
         api.api_pa_pc_get_current_location(channel, get_location_params)
 
     @classmethod
@@ -61,6 +61,11 @@ class AntarisCtrl:
     @classmethod
     def delete_channel_and_goodbye(cls, channel):
         api.api_pa_pc_delete_channel(channel)
+
+    @classmethod
+    def shutdown_app(cls, channel, correlation_id):
+        resp_shutdown_params = RespShutdownParams(correlation_id, AntarisReturnCode.An_SUCCESS)
+        api.api_pa_pc_response_shutdown(channel, resp_shutdown_params)
 
     @classmethod
     def respond_to_heartbeat(cls):
