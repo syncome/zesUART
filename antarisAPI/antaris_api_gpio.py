@@ -41,7 +41,7 @@ def verify_gpio_pin(input_pin):
     return status
 
 #device specific functions
-Device = BitBangDevice('FT7APF28')
+Device = BitBangDevice('FT769754')
 
 def api_pa_pc_read_gpio(pin):
     status = verify_gpio_pin(pin)

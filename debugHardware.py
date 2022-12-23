@@ -10,27 +10,43 @@ from flightService import shutdown_app, process_health_check, \
     process_response_payload_power_control, download_logfile_to_groundstation, run_payload_in_flight_mode
 
 from flightService import fsms
+from gpio_antaris import set_POWER_pin, set_NRESET_pin, read_STATUS_pin
 
-
-def start_zes_ground_test(mythread: FsmThread):
-    mythread.state = "STARTED"
-    ZesAntarisOperator.ground_test_mode(mythread)
-    mythread.state = "EXISTING"
-
-    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
-
-def start_zes_flight_test(mythread: FsmThread):
+def start_zes_hardware_debugging(mythread: FsmThread):
     mythread.state = "STARTED"
 
-    # AntarisCtrl.get_sat_location(mythread.channel, mythread.correlation_id)
-    # mythread.condition.acquire()
-    # mythread.condition.wait()
+    print('=== Debugging Power===')
+    set_POWER_pin(mythread, on=False)
+    input('[Action] Please check and confirm the power to ZES payload is *off*, ZES payload Green LED is *off*.\n Any key to continue.....')
 
-    ZesAntarisOperator.power_on_and_prepare_payload_if_necessary(mythread)
-    ZesAntarisOperator.one_time_flight_service_mode(mythread)
-    mythread.state = "EXISTING"
+    set_POWER_pin(mythread, on=True)
+    input('[Action] Please check and confirm the power to ZES payload is *on*, ZES payload Green LED is *on*.\n Any key to continue.....')
+
+    print('=== Debugging GPIO-5 NRST===')
+    set_NRESET_pin(value=True)
+    input('[Action] Please check and confirm Antaris GPIO-5 (NRST) is *on* \n Any key to continue.....')
+
+    set_NRESET_pin(value=False)
+    input('[Action] Please check and confirm Antaris GPIO-5 (NRST) is *off* \n Any key to continue.....')
+
+    print('=== Debugging GPIO-5 STAT ===')
+    value = read_STATUS_pin()
+    input(f'Current status value is {value} \n Any key to continue.....')
+
+    print('=== Debugging UART ===')
+    from ZesAntaris import ZesAntarisOperator
+    msg = ZesAntarisOperator.test_operation_A(mblk=0)
+    if not msg:
+        print('[Error] Cannot communicate with ZES payload via UART')
+    else:
+        print(f'Received msg: {msg}')
+
+        print('=== Starting Ground Test ===')
+        ZesAntarisOperator.ground_test_mode(mythread)
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+    mythread.state = "EXITING"
+
 
 def start_test_sequence(start_seq_param):
     # start all sequences
@@ -43,14 +59,9 @@ def zes_app_test(mode='ground'):
     callback_func_list = {
         'StartSequence': start_test_sequence,
         'Shutdown': shutdown_app,
-        # 'PassthruCmd': process_passthru_tele_cmd,
-        # 'NewFileUploaded': process_new_file_uploaded,
         'HealthCheck': process_health_check,
         'RespRegister': process_response_register,
-        # 'RespPointToTarget': process_reponse_point_to_target,
         'RespGetCurrentLocation': process_response_get_current_location,
-        # 'RespGetCurrentTime': process_response_get_current_time,
-        # 'RespGetCurrentPowerState': process_response_get_current_power_state,
         'RespStageFileDownload': process_response_download_file_to_gs,
         'RespPayloadPowerControl': process_response_payload_power_control,
     }
@@ -64,10 +75,8 @@ def zes_app_test(mode='ground'):
 
 
     # Create FSM threads  (arg : channel, thread-id, correlation_id, count, seq_id, fsm-function)
-    if mode == 'ground':
-        fsms[1] = FsmThread(channel, 1, 10000, 'ZES_GROUND_TEST', start_zes_ground_test)
-    else:
-        fsms[1] = FsmThread(channel, 1, 10000, 'ZES_FLIGHT_TEST', start_zes_flight_test)
+    fsms[1] = FsmThread(channel, 1, 10000, 'ZES_HARDWARE_DEBUGGING', start_zes_hardware_debugging)
+
 
     print("===================================")
     print(fsms[1].seq_id)
@@ -83,10 +92,6 @@ def zes_app_test(mode='ground'):
     for key in fsms:
         if fsms[key].state != "NOT_STARTED":
             fsms[key].join()
-
-    fsms[4] = FsmThread(channel, 4, 40000, 'ZES_Download_Log', download_logfile_to_groundstation)
-    fsms[4].start()
-    fsms[4].join()
 
     AntarisCtrl.delete_channel_and_goodbye(channel)
 

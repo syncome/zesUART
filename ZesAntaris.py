@@ -50,11 +50,16 @@ class ZesAntarisOperator:
         configPath = HOME_FOLDER_PATH + '/zesUART/mblk.ini'
         config.read(configPath)
         mblk = 0
+        current_mblk = 0
         try:
             current_mblk = config.get('MBLK', 'current_mblk')
+        except:
+            ZesLogger.log('ERR', f'[!!!] Cannot read current_mblk from MBLK, run ZES Ground Test first.')
+
+        try:
             mblk = int(current_mblk)
-        except Exception as err:
-            ZesLogger.log('ERR', f'Cannot convert current_mblk to int: {current_mblk}, use default 0 instead')
+        except:
+            ZesLogger.log('ERR', f'[!!!] Cannot convert current_mblk to int: {current_mblk}, use default 0 instead')
         return mblk
 
     @classmethod

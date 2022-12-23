@@ -4,6 +4,7 @@ from zesThread import FsmThread
 import time, sys
 
 from antarisAPI.gen.antaris_api_types import *
+from antarisAPI.gen.antaris_sdk_version import *
 from ZesLogger import ZesLogger
 from config import *
 import shutil
@@ -185,6 +186,9 @@ def download_logfile_to_groundstation(mythread: FsmThread):
 
 
 def run_payload_in_flight_mode():
+    SDK_VERSION = f'{ANTARIS_PA_PC_SDK_MAJOR_VERSION}.{ANTARIS_PA_PC_SDK_MINOR_VERSION}.{ANTARIS_PA_PC_SDK_PATCH_VERSION}'
+    ZesLogger.log(cmdStr='SYS', dataStr=f'Zes Ver:{ZES_VERSION}, SDK Ver:{SDK_VERSION}')
+
     global fsms
 
     callback_func_list = {
@@ -214,6 +218,7 @@ def run_payload_in_flight_mode():
     fsms[3] = FsmThread(channel, 3, 30000, 'Antaris_Status', antaris_satellite_status)
 
     AntarisCtrl.register_app(channel, 10000)
+    start_sequence(None)
 
     while fsms[1].state == "NOT_STARTED":
         if DEBUG: print(f'{fsms[1].seq_id} is not started yet, waiting PC to initialize and start')
