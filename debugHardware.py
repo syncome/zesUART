@@ -1,5 +1,7 @@
 import sys
 from config import *
+from antarisAPI.gen.antaris_sdk_version import *
+from ZesLogger import ZesLogger
 from ZesAntaris import ZesAntarisOperator
 from zesThread import FsmThread
 from AntarisCtrl import AntarisCtrl
@@ -37,7 +39,7 @@ def start_zes_hardware_debugging(mythread: FsmThread):
     from ZesAntaris import ZesAntarisOperator
     msg = ZesAntarisOperator.test_operation_A(mblk=0)
     if not msg:
-        print('[Error] Cannot communicate with ZES payload via UART')
+        print('[Error] Cannot communicate with ZES payload via UART.  Try to swap the TX/RX connection?')
     else:
         print(f'Received msg: {msg}')
 
@@ -56,6 +58,9 @@ def start_test_sequence(start_seq_param):
 
 
 def zes_app_test(mode='ground'):
+    SDK_VERSION = f'{ANTARIS_PA_PC_SDK_MAJOR_VERSION}.{ANTARIS_PA_PC_SDK_MINOR_VERSION}.{ANTARIS_PA_PC_SDK_PATCH_VERSION}'
+    ZesLogger.log(cmdStr='SYS', dataStr=f'Zes Ver:{ZES_VERSION}, SDK Ver:{SDK_VERSION}')
+
     callback_func_list = {
         'StartSequence': start_test_sequence,
         'Shutdown': shutdown_app,
