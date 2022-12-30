@@ -25,15 +25,16 @@ def start_zes_hardware_debugging(mythread: FsmThread):
     input('[Action 2] Please check and confirm the power to ZES payload is *on*, ZES payload Green LED is *on*.\n Press any key to continue.....')
 
     print(f'=== Debugging GPIO-{GPIO_NRESET_PIN} NRESET ===')
-    set_NRESET_pin(value=True)
-    input('[Action 3] Please check and confirm Antaris GPIO-5 (NRST) is value *HIGH* \n Press any key to continue.....')
 
     set_NRESET_pin(value=False)
     input('[Action 4] Please check and confirm Antaris GPIO-5 (NRST) is value *LOW* \n Press any key to continue.....')
 
+    set_NRESET_pin(value=True)
+    input('[Action 4] Please check and confirm Antaris GPIO-5 (NRST) is value *HIGH* \n Press any key to continue.....')
+
     print(f'=== Debugging GPIO-{GPIO_FLAG_PIN} FLAG ===')
     value = read_STATUS_pin()
-    input(f'Current status value is {value} \n Press any key to continue.....')
+    input(f'Current status value is {value} \n Press any key to continue.......')
 
     print('=== Debugging UART ===')
     from ZesAntaris import ZesAntarisOperator
