@@ -11,41 +11,62 @@ from flightService import shutdown_app, process_health_check, \
     process_response_download_file_to_gs, \
     process_response_payload_power_control, download_logfile_to_groundstation, run_payload_in_flight_mode
 
+
+YELLOW = "\x1b[1;33;40m"
+RED = "\x1b[1;31;40m"
+
 from flightService import fsms
 from gpio_antaris import set_POWER_pin, set_NRESET_pin, read_STATUS_pin
 
 def start_zes_hardware_debugging(mythread: FsmThread):
     mythread.state = "STARTED"
 
-    print('=== Debugging Power===')
+    print('=== 1 Debugging Power===')
+    print(">Setting POWER to OFF...\n")
     set_POWER_pin(mythread, on=False)
-    input('[Action 1] Please check and confirm the power to ZES payload is *off*, ZES payload Green LED is *off*.\n Press any key to continue.....')
+    input(f'[Action 1.1] Please check and confirm the power to ZES payload is *OFF*, ZES payload Green LED is *OFF*.\n Press any key to continue.....\n\n')
+    print(">Reading FLAG ...\n")
+    value = read_STATUS_pin()
+    input(f'[Action 1.2] The current FLAG value read from API is {value}, expected value is *LOW*\n Press any key to continue.....')
 
+    print(">Setting POWER to ON...\n")
     set_POWER_pin(mythread, on=True)
-    input('[Action 2] Please check and confirm the power to ZES payload is *on*, ZES payload Green LED is *on*.\n Press any key to continue.....')
+    input('[Action 1.3] Please check and confirm the power to ZES payload is *ON*, ZES payload Green LED is *ON*.\n Press any key to continue.....')
+    print(">Reading FLAG ...\n")
+    value = read_STATUS_pin()
+    input(f'[Action 1.4] The current FLAG value read from API is {value}, expected value is *HIGH*\n Press any key to continue.....')
 
-    print(f'=== Debugging GPIO-{GPIO_NRESET_PIN} NRESET ===')
+    print(f'\n\n\n=== 2 Debugging GPIO-{GPIO_NRESET_PIN} NRESET ===')
+    input('[Action 2.1] Please check the default NRST value, before any commands is send out \n Press any key to continue.....')
 
+    print(">Setting NRST to LOW...\n")
     set_NRESET_pin(value=False)
-    input('[Action 4] Please check and confirm Antaris GPIO-5 (NRST) is value *LOW* \n Press any key to continue.....')
+    input('[Action 2.2] Please check and confirm Antaris GPIO-5 (NRST) is value *LOW* \n Press any key to continue.....')
 
+    print(">Setting NRST to HIGH...\n")
     set_NRESET_pin(value=True)
-    input('[Action 4] Please check and confirm Antaris GPIO-5 (NRST) is value *HIGH* \n Press any key to continue.....')
+    input('[Action 2.3] Please check and confirm Antaris GPIO-5 (NRST) is value *HIGH* \n Press any key to continue.....')
 
-    print(f'=== Debugging GPIO-{GPIO_FLAG_PIN} FLAG ===')
     value = read_STATUS_pin()
     input(f'Current status value is {value} \n Press any key to continue.......')
 
-    print('=== Debugging UART ===')
+    print('\n\n\n=== 3 Debugging UART ===')
     from ZesAntaris import ZesAntarisOperator
-    msg = ZesAntarisOperator.test_operation_A(mblk=0)
-    if not msg:
-        print('[Error] Cannot communicate with ZES payload via UART.  Try to swap the TX/RX connection?')
-    else:
-        print(f'Received msg: {msg}')
 
-        print('=== Starting Ground Test ===')
-        ZesAntarisOperator.ground_test_mode(mythread)
+    while True:
+        print(">Sending command 0x00 to payload...\n")
+        msg = ZesAntarisOperator.test_operation_A(mblk=0)
+        if not msg:
+            print('[Error] Cannot communicate with ZES payload via UART. \n')
+            print('Key in "quit" to quit, others to continue...')
+            action = input()
+            if action == 'quite':
+                break
+        else:
+            print(f'Received msg: {msg}')
+
+            print('=== Starting Ground Test ===')
+            ZesAntarisOperator.ground_test_mode(mythread)
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
     mythread.state = "EXITING"
