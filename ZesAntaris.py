@@ -1,4 +1,3 @@
-from AntarisCtrl import AntarisCtrl
 import serial
 import time
 from configparser import ConfigParser
