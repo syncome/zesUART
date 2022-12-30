@@ -58,15 +58,16 @@ def start_zes_hardware_debugging(mythread: FsmThread):
         msg = ZesAntarisOperator.test_operation_A(mblk=0)
         if not msg:
             print('[Error] Cannot communicate with ZES payload via UART. \n')
-            print('Key in "quit" to quit, others to continue...')
+            print('Key in "q" to quit, other keyss to continue...')
             action = input()
-            if action == 'quite':
+            if action == '':
                 break
         else:
             print(f'Received msg: {msg}')
 
             print('=== Starting Ground Test ===')
             ZesAntarisOperator.ground_test_mode(mythread)
+            break
 
     AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
     mythread.state = "EXITING"
