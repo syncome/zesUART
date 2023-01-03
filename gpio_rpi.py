@@ -2,9 +2,10 @@ import RPi.GPIO as GPIO
 
 from ZesLogger import ZesLogger
 from zesThread import FsmThread
+from config import *
 
-STATUS_PIN = 4
-N_RESET_PIN = 27
+STATUS_PIN = GPIO_FLAG_PIN
+N_RESET_PIN = GPIO_NRESET_PIN
 # status pin
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(STATUS_PIN, GPIO.IN)

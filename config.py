@@ -1,4 +1,4 @@
-PLATFORM = 'ANTARIS'
+PLATFORM = 'RPI'
 
 
 ZES_VERSION = '1.0.1.8'
@@ -64,10 +64,10 @@ elif PLATFORM == 'RPI':
     Test Settings
     =========================================================
     '''
-    SERIAL_DEVICE = "/dev/serial0"
+    SERIAL_DEVICE = "/dev/ttyAMA0"
 
-    GPIO_NRESET_PIN = "/dev/antaris/gpio13/value"
-    GPIO_FLAG_PIN = "/dev/antaris/gpio14/value"
+    GPIO_NRESET_PIN = 24
+    GPIO_FLAG_PIN = 23
 
     HOME_FOLDER_PATH = "/home/pi"
     DEBUG = True
