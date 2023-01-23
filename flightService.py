@@ -137,10 +137,11 @@ def start_zes_app(mythread: FsmThread):
     mythread.state = "EXISTING"
 
 def monitor_zes_FLAG(mythread: FsmThread):
-    mythread.state = "STARTED"
-
-    AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
-    mythread.state = "EXISTING"
+    # mythread.state = "STARTED"
+    #
+    # AntarisCtrl.sequence_done(mythread.channel, mythread.seq_id)
+    # mythread.state = "EXISTING"
+    pass
 
 
 
@@ -186,6 +187,7 @@ def download_logfile_to_groundstation(mythread: FsmThread):
 
 
 def run_payload_in_flight_mode():
+    ZesAntarisOperator.patch_STATUS_pin()
     SDK_VERSION = f'{ANTARIS_PA_PC_SDK_MAJOR_VERSION}.{ANTARIS_PA_PC_SDK_MINOR_VERSION}.{ANTARIS_PA_PC_SDK_PATCH_VERSION}'
     ZesLogger.log(cmdStr='SYS', dataStr=f'Zes Ver:{ZES_VERSION}, SDK Ver:{SDK_VERSION}')
 
@@ -214,7 +216,7 @@ def run_payload_in_flight_mode():
 
     # Create FSM threads  (arg : channel, thread-id, correlation_id, count, seq_id, fsm-function)
     fsms[1] = FsmThread(channel, 1, 10000, 'ZES_Main', start_zes_app)
-    fsms[2] = FsmThread(channel, 2, 20000, 'ZES_Monitoring', monitor_zes_FLAG)
+    # fsms[2] = FsmThread(channel, 2, 20000, 'ZES_Monitoring', monitor_zes_FLAG)
     fsms[3] = FsmThread(channel, 3, 30000, 'Antaris_Status', antaris_satellite_status)
 
     AntarisCtrl.register_app(channel, 10000)

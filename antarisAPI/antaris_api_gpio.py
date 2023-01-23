@@ -55,7 +55,12 @@ def api_pa_pc_read_gpio(pin):
     op = (Device.port >> pin) & g_MASK_BIT_0
     return op
 
-def api_pa_pc_write_gpio(pin, value):
+def api_pa_pc_write_gpio(pin, value, shouldPatch=True):
+    if pin == 5 and value == 1:
+        # ZES Hard patch for NRST (GPIO-5):
+        # set GPIO in read mode so that the onboard pull up resistor can pull NRST up to 1
+        return api_pa_pc_read_gpio(pin)
+
     status = verify_gpio_pin(pin)
     if status == g_GPIO_ERROR:
         return g_GPIO_ERROR

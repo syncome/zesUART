@@ -28,22 +28,14 @@ def set_POWER_pin(mythread: FsmThread, on: bool):
 
 
 def set_NRESET_pin(value: bool):
-    lock = threading.Lock()
-    lock.acquire()
-    print('will set NREST PIN')
     numValue = 1 if value else 0
     AntarisCtrl.set_gpio_pin(GPIO_NRESET_PIN, numValue)
-    # with open(GPIO_NRESET_PIN, 'w') as f:
-    #     f.write('1' if value else '0')
-    lock.release()
     ZesLogger.log(cmdStr='SYS', dataStr=f'NRESET is now set to {numValue}')
 
 
 def read_STATUS_pin():
-    lock = threading.Lock()
-    lock.acquire()
-    # with open(GPIO_FLAG_PIN, 'r') as f:
-    #     value = f.read()
-    isValueHigh = AntarisCtrl.read_gpio_pin(GPIO_FLAG_PIN)
-    lock.release()
-    return isValueHigh
+    patch_STATUS_pin()
+    return True  # assume payload is always working --> require manual reboot or reset
+
+def patch_STATUS_pin():
+    AntarisCtrl.set_gpio_pin(GPIO_FLAG_PIN, 0)

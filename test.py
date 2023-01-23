@@ -40,6 +40,8 @@ def start_test_sequence(start_seq_param):
 
 
 def zes_app_test(mode='ground'):
+    ZesAntarisOperator.patch_STATUS_pin()
+
     callback_func_list = {
         'StartSequence': start_test_sequence,
         'Shutdown': shutdown_app,

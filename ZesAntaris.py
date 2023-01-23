@@ -12,7 +12,7 @@ from config import DEBUG, USE_VIRTUAL_PAYLOAD
 from zesThread import FsmThread
 
 if PLATFORM == 'ANTARIS':
-    from gpio_antaris import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
+    from gpio_antaris import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state, patch_STATUS_pin
 elif PLATFORM == 'ANTARIS-DOCKER':
     # from gpio_virtual import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
     from gpio_virtual import read_STATUS_pin, set_NRESET_pin
@@ -30,6 +30,9 @@ else:
 
 
 class ZesAntarisOperator:
+    @classmethod
+    def patch_STATUS_pin(cls):
+        patch_STATUS_pin()
     #
     # CMD20 will be the selector
     @classmethod
