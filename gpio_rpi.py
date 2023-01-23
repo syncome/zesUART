@@ -56,3 +56,6 @@ def read_STATUS_pin():
         return True
     else:
         return False
+
+def patch_STATUS_pin():
+    pass

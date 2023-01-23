@@ -23,3 +23,6 @@ def set_NRESET_pin(value: bool):
 def read_STATUS_pin():
     print(f'STATUS is True')
     return True
+
+def patch_STATUS_pin():
+    pass

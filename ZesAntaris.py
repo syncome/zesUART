@@ -15,15 +15,15 @@ if PLATFORM == 'ANTARIS':
     from gpio_antaris import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state, patch_STATUS_pin
 elif PLATFORM == 'ANTARIS-DOCKER':
     # from gpio_virtual import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
-    from gpio_virtual import read_STATUS_pin, set_NRESET_pin
+    from gpio_virtual import read_STATUS_pin, set_NRESET_pin, patch_STATUS_pin
     if USE_VIRTUAL_HARDWARE_CTRL:
         from gpio_virtual import set_POWER_pin, get_POWER_state
     else:
         from gpio_antaris import set_POWER_pin, get_POWER_state
 elif PLATFORM == 'RPI':
-    from gpio_rpi import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
+    from gpio_rpi import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state, patch_STATUS_pin
 else:
-    from gpio_virtual import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state
+    from gpio_virtual import read_STATUS_pin, set_NRESET_pin, set_POWER_pin, get_POWER_state, patch_STATUS_pin
 
 
 
@@ -62,6 +62,8 @@ class ZesAntarisOperator:
             mblk = int(current_mblk)
         except:
             ZesLogger.log('ERR', f'[!!!] Cannot convert current_mblk to int: {current_mblk}, use default 0 instead')
+
+        ZesLogger.log('SYS', f'use current_mblk {mblk}')
         return mblk
 
     @classmethod
