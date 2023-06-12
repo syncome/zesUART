@@ -22,20 +22,38 @@ SERIAL_READ_BUFFER_SIZE = 128  # 128-bit per stream, multiplied 3 times
 # SERIAL_DEVICE = 'COM5'
 SERIAL_BAUDRATE = 9600
 
+
+# def add_offset_to_tuple(tup, offset):
+#     # Convert the tuple to a list
+#     lst = list(tup)
+#
+#     # Add the offset value to each element in the list
+#     lst = [x + offset for x in lst]
+#
+#     # Convert the list back to a tuple
+#     new_tup = tuple(lst)
+#     print(new_tup)
+#     return new_tup
+#
+# offset = 8   # For version Prof Amel
 # Out A B C register locations
-Others_Loc = (0, 5)
-Wrt_Loc = (6, 7)
-FPGA2_Loc = (8, 8)
-TestSta_Loc = (9, 10)
-Reset_Loc = (11, 12)
-APG2_Loc = (13, 28)
-APG1_Loc = (29, 44)
-APG0_Loc = (45, 60)
-AZ_Loc = (61, 61)
-ErDaC_Loc = (62, 85)
-ErErc_Loc = (86, 109)
-Cycle_Loc = (110, 119)
-OpCode_Loc = (120, 127)
+POL_Counter_Loc     = (0, 7)
+APG0_Loc            = (8, 13)
+Wrt_Loc             = (14, 15)
+FPGA2_Loc           = (16, 16)
+TestSta_Loc         = (17, 18)
+Reset_Loc           = (19, 20)
+APG3_Loc            = (21, 36)
+APG2_Loc            = (37, 52)
+APG1_Loc            = (53, 68)
+AZ_Loc              = (69, 69)
+ErDaC_Loc           = (70, 93)
+ErErc_Loc           = (94, 117)
+Cycle_Loc           = (118, 127)
+OpCode_Loc          = (128, 135)
+
+
+
 
 LOG_FILE_PATH = HOME_FOLDER_PATH + "/zesUART/log/"
 if not os.path.exists(LOG_FILE_PATH):
@@ -66,14 +84,14 @@ reg_name = ["Others_Loc",
 
 
 reg_location = [
-Others_Loc,
+APG0_Loc,
 Wrt_Loc,
 FPGA2_Loc,
 TestSta_Loc,
 Reset_Loc,
+APG3_Loc,
 APG2_Loc,
 APG1_Loc,
-APG0_Loc,
 AZ_Loc,
 ErDaC_Loc,
 ErErc_Loc,

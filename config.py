@@ -1,4 +1,4 @@
-PLATFORM = 'ANTARIS'
+PLATFORM = 'WINDOWS'
 
 
 ZES_VERSION = '1.0.1.10'
@@ -47,7 +47,7 @@ elif PLATFORM == 'WINDOWS':
     Development Settings
     =========================================================
     '''
-    SERIAL_DEVICE = "COM5"
+    SERIAL_DEVICE = "COM6"
 
     GPIO_NRESET_PIN = "/dev/antaris/gpio13/value"
     GPIO_FLAG_PIN = "/dev/antaris/gpio14/value"

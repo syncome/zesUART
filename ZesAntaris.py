@@ -109,8 +109,6 @@ class ZesAntarisOperator:
         return bitsStr
 
 
-    
-    
     def send_to_serial(cls, cmd):
         line = None
         if not USE_VIRTUAL_PAYLOAD:
@@ -277,6 +275,14 @@ class ZesAntarisOperator:
             return 'OK'
 
     @classmethod
+    def check_FPGA2(self, msg):  # TODO: Replace repair bit
+        bitsStr = self.get_bits_of_bytesarray(msg, FPGA2_Loc)
+        if bitsStr == '1':
+            print("[ERROR]: FPGA2 OUTPUT ALL ZERO **********************")
+
+
+
+    @classmethod
     def hard_reset(cls, mythread: FsmThread):
         if DEBUG: print('[Debug] >>>  Performing hard reset')
         set_POWER_pin(mythread, False)
@@ -316,7 +322,6 @@ class ZesAntarisOperator:
             for retry in range(MAX_RETRY):  # for each mblk
                 print(f'[Debug] >>>  Trying for the {retry+1} time....')
                 if needHRT:
-                    print(mythread.correlation_id)
                     cls.hard_reset(mythread)
                     needHRT = False
 
@@ -328,6 +333,7 @@ class ZesAntarisOperator:
                 status = ''
                 msg = cls.test_operation_A(mblk=mblk)
                 status = cls.check_TestSta(msg)
+                cls.check_FPGA2(msg)
                 if status == 'SRT':
                     mblk += 1
                     cls.soft_reset()
@@ -342,6 +348,7 @@ class ZesAntarisOperator:
                 status = ''
                 msg = cls.test_operation_B(mblk=mblk)
                 status = cls.check_TestSta(msg)
+                cls.check_FPGA2(msg)
                 if status == 'SRT':
                     mblk += 1
                     cls.soft_reset()
@@ -359,6 +366,7 @@ class ZesAntarisOperator:
                 while status != 'OK':
                     msg = cls.write_operation_A(mblk=mblk)
                     status = cls.check_WriteSta(msg)
+                    cls.check_FPGA2(msg)
 
                     if status == 'FAIL':
                         softFailCount += 1
@@ -384,6 +392,7 @@ class ZesAntarisOperator:
                 status = ''
                 msg = cls.read_check_A(mblk=mblk)
                 status = cls.check_ReadReset(msg)
+                cls.check_FPGA2(msg)
                 if status == 'SRT':
                     mblk += 1
                     cls.soft_reset()
@@ -397,6 +406,7 @@ class ZesAntarisOperator:
                 while status != 'OK':
                     msg = cls.write_operation_B(mblk=mblk)
                     status = cls.check_WriteSta(msg)
+                    cls.check_FPGA2(msg)
 
                     if status == 'FAIL':
                         softFailCount += 1
@@ -421,6 +431,7 @@ class ZesAntarisOperator:
                 status = ''
                 msg = cls.read_check_B(mblk=mblk)
                 status = cls.check_ReadReset(msg)
+                cls.check_FPGA2(msg)
                 if status == 'SRT':
                     mblk += 1
                     cls.soft_reset()
