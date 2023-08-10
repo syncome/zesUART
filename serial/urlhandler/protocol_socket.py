@@ -345,7 +345,7 @@ class Serial(SerialBase):
 
 
 #
-# simple client test
+# simple client test.py
 if __name__ == '__main__':
     import sys
     s = Serial('socket://localhost:7000')

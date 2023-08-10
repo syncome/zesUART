@@ -105,6 +105,6 @@ def main():
             sys.stderr.write("no ports found\n")
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# test
+# test.py
 if __name__ == '__main__':
     main()

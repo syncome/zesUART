@@ -188,7 +188,7 @@ class Serial(SerialBase):
         # when a write timeout is configured check if we would be successful
         # (not sending anything, not even the part that would have time)
         if self._write_timeout is not None and time_used_to_send > self._write_timeout:
-            # must wait so that unit test succeeds
+            # must wait so that unit test.py succeeds
             time_left = self._write_timeout
             while time_left > 0 and not self._cancel_write:
                 time.sleep(min(time_left, 0.5))
@@ -294,7 +294,7 @@ class Serial(SerialBase):
     # None so far
 
 
-# simple client test
+# simple client test.py
 if __name__ == '__main__':
     import sys
     s = Serial('loop://')

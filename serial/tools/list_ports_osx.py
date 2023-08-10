@@ -293,7 +293,7 @@ def comports(include_links=False):
             ports.append(info)
     return ports
 
-# test
+# test.py
 if __name__ == '__main__':
     for port, desc, hwid in sorted(comports()):
         print("{}: {} [{}]".format(port, desc, hwid))

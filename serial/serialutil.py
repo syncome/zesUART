@@ -14,8 +14,8 @@ import time
 
 # ``memoryview`` was introduced in Python 2.7 and ``bytes(some_memoryview)``
 # isn't returning the contents (very unfortunate). Therefore we need special
-# cases and test for it. Ensure that there is a ``memoryview`` object for older
-# Python versions. This is easier than making every test dependent on its
+# cases and test.py for it. Ensure that there is a ``memoryview`` object for older
+# Python versions. This is easier than making every test.py dependent on its
 # existence.
 try:
     memoryview
@@ -362,7 +362,7 @@ class SerialBase(io.RawIOBase):
         """Change timeout setting."""
         if timeout is not None:
             try:
-                timeout + 1     # test if it's a number, will throw a TypeError if not...
+                timeout + 1     # test.py if it's a number, will throw a TypeError if not...
             except TypeError:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
             if timeout < 0:
@@ -383,7 +383,7 @@ class SerialBase(io.RawIOBase):
             if timeout < 0:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
             try:
-                timeout + 1     # test if it's a number, will throw a TypeError if not...
+                timeout + 1     # test.py if it's a number, will throw a TypeError if not...
             except TypeError:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
 
@@ -403,7 +403,7 @@ class SerialBase(io.RawIOBase):
             if ic_timeout < 0:
                 raise ValueError("Not a valid timeout: {!r}".format(ic_timeout))
             try:
-                ic_timeout + 1     # test if it's a number, will throw a TypeError if not...
+                ic_timeout + 1     # test.py if it's a number, will throw a TypeError if not...
             except TypeError:
                 raise ValueError("Not a valid timeout: {!r}".format(ic_timeout))
 

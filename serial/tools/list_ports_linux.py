@@ -106,7 +106,7 @@ def comports(include_links=False):
             if info.subsystem != "platform"]    # hide non-present internal serial ports
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# test
+# test.py
 if __name__ == '__main__':
     for info in sorted(comports()):
         print("{0}: {0.subsystem}".format(info))

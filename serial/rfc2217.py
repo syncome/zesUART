@@ -1338,7 +1338,7 @@ class PortManager(object):
                 self.logger.warning("unknown subnegotiation: {!r}".format(suboption))
 
 
-# simple client test
+# simple client test.py
 if __name__ == '__main__':
     import sys
     s = Serial('rfc2217://localhost:7000', 115200)

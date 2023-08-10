@@ -258,7 +258,7 @@ class ReaderThread(threading.Thread):
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# test
+# test.py
 if __name__ == '__main__':
     # pylint: disable=wrong-import-position
     import sys

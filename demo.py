@@ -6,7 +6,7 @@ import datetime
 
 LOG_FILE_PATH = ""  # ending with back-slash /
 
-SERIAL_DEVICE = "/dev/ttyAMA0"    # serial device ending point
+SERIAL_DEVICE = "/dev/tty.usbserial-53220409041"    # serial device ending point
 SERIAL_BAUDRATE = 9600
 
 def power_on_zes_payload():
@@ -60,17 +60,22 @@ def send_to_serial(cmd):
                             stopbits=serial.STOPBITS_ONE,
                             timeout=0.1)
     except Exception as err:
+        print("Cannot open serial port")
         save_to_log('ERR', f'Cannot open serial port {SERIAL_DEVICE}')
         return ''
 
-    ser.write(cmd)        # send to payload via serial/UART
-    time.sleep(0.2)
-    line = ser.readline() # read payload response via serial/UART
+    ser.write(cmd)         # send to payload via serial/UART
+    line = ser.readline()  # read payload response via serial/UART
+    time.sleep(0.1)
     return line
 
 
+def convert_byte_data_to_hex_string(data):
+    return data.hex()
+
+
 if __name__ == "__main__":
-    # ============= Fresh Star ================
+    # ============= Fresh Start ================
     power_on_zes_payload()
     save_to_log('POWER', 'Power On')
 
@@ -83,9 +88,11 @@ if __name__ == "__main__":
         save_to_log('STATUS', satStatus)
 
         time.sleep(1)
-        response = send_to_serial(0x80)  # hex 0x80, integer 128
+        response = send_to_serial(0b10000000)  # hex 0x80, integer 128
 
         if not response: # payload has no valid response
+            print("!!!Nothing received")
+
             power_off_zes_payload()
             save_to_log('POWER', 'Power Reset')
 
@@ -99,6 +106,8 @@ if __name__ == "__main__":
             time.sleep(1)
 
         else:  # payload has valid response
-            save_to_log('CMD', response)
-            time.sleep(10*60)    # sleep for 10 minutes
+            hexString = convert_byte_data_to_hex_string(response)
+            print(hexString)
+            save_to_log('CMD', hexString)
+            time.sleep(1)    # sleep for 10 minutes
 

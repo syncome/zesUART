@@ -63,7 +63,7 @@ class Serial(serial.Serial):
                 if n < 1:
                     raise ValueError('option "n" expects a positive integer larger than 1: {!r}'.format(value))
             elif option == 'skip_busy':
-                # open to test if port is available. not the nicest way..
+                # open to test.py if port is available. not the nicest way..
                 test_open = True
             else:
                 raise ValueError('unknown option: {!r}'.format(option))

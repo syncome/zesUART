@@ -421,7 +421,7 @@ def comports(include_links=False):
     return list(iterate_comports())
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# test
+# test.py
 if __name__ == '__main__':
     for port, desc, hwid in sorted(comports()):
         print("{}: {} [{}]".format(port, desc, hwid))
