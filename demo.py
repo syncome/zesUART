@@ -6,7 +6,8 @@ import datetime
 
 LOG_FILE_PATH = ""  # ending with back-slash /
 
-SERIAL_DEVICE = "/dev/tty.usbserial-53220409041"    # serial device ending point
+# SERIAL_DEVICE = "/dev/tty.usbserial-53220409041"
+SERIAL_DEVICE = "COM6"    # serial device ending point
 SERIAL_BAUDRATE = 9600
 
 def power_on_zes_payload():
@@ -47,6 +48,7 @@ def save_to_log(logType, text):
     filename = 'ZES_' + dateStr + '.log'
     timeStr = timeNow.strftime('%H:%M:%S.%f')
     logLine = timeStr + "," + logType + ',' + text
+    print(logLine)
     with open(LOG_FILE_PATH + filename, 'a+') as f:
         f.write(logLine + '\n')
 
@@ -88,7 +90,7 @@ if __name__ == "__main__":
         save_to_log('STATUS', satStatus)
 
         time.sleep(1)
-        response = send_to_serial(0b10000000)  # hex 0x80, integer 128
+        response = send_to_serial(b'\x80')  # hex 0x80, integer 128
 
         if not response: # payload has no valid response
             print("!!!Nothing received")
@@ -107,7 +109,6 @@ if __name__ == "__main__":
 
         else:  # payload has valid response
             hexString = convert_byte_data_to_hex_string(response)
-            print(hexString)
             save_to_log('CMD', hexString)
-            time.sleep(1)    # sleep for 10 minutes
+            time.sleep(10*60)    # sleep for 10 minutes
 
