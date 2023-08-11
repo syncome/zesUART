@@ -6,47 +6,46 @@ import datetime
 
 LOG_FILE_PATH = ""  # ending with back-slash /
 
-# SERIAL_DEVICE = "/dev/tty.usbserial-53220409041"
-SERIAL_DEVICE = "COM6"    # serial device ending point
+SERIAL_DEVICE = "/dev/tty.usbserial-53220409041"
+# SERIAL_DEVICE = "COM6"    # serial device ending point
 SERIAL_BAUDRATE = 9600
+OPERATION_INTERVAL_MINUTES = 10
 
 def power_on_zes_payload():
     # TODO: Insert the REAL control code to power on ZES payload
-    print('Power on ZES payload....')
-    pass
+    print('[TODO] Power on ZES payload....')
 
 
 def power_off_zes_payload():
     # TODO: Insert the REAL control code to power OFF ZES payload
-    print('Power off ZES payload....')
-    pass
+    print('[TODO] Power off ZES payload....')
 
 
 def pull_up_pin_nReset():
     # TODO: Insert the REAL control code to pull up pin nReset
-    print('Pulling up nReset....')
-    pass
+    print('[TODO] Pulling up nReset....')
 
 
 def pull_down_pin_nReset():
     # TODO: Insert the REAL control code to pull down pin nReset
-    print('Pulling down nReset....')
-    pass
+    print('[TODO] Pulling down nReset....')
 
 
 def get_satellite_status():
     # TODO: Insert the REAL control code to get satellite current status
-    longitude = 0.0
-    latitude = 0.0
-    altitude = 0.0
-    return f'LON={longitude} LAT={latitude} ALT={altitude}'
+    # longitude = 0.0
+    # latitude = 0.0
+    # altitude = 0.0
+    # return f'LON={longitude} LAT={latitude} ALT={altitude}'
+    upCounter = 0
+    return f'UPCOUNT={upCounter}'
 
 
 def save_to_log(logType, text):
     timeNow = datetime.datetime.utcnow()
     dateStr = timeNow.strftime('%Y%m%d')
     filename = 'ZES_' + dateStr + '.log'
-    timeStr = timeNow.strftime('%H:%M:%S.%f')
+    timeStr = timeNow.strftime('%Y%m%d %H:%M:%S.%f')
     logLine = timeStr + "," + logType + ',' + text
     print(logLine)
     with open(LOG_FILE_PATH + filename, 'a+') as f:
@@ -78,6 +77,9 @@ def convert_byte_data_to_hex_string(data):
 
 if __name__ == "__main__":
     # ============= Fresh Start ================
+    pull_down_pin_nReset()
+    time.sleep(1)
+
     power_on_zes_payload()
     save_to_log('POWER', 'Power On')
 
@@ -93,13 +95,13 @@ if __name__ == "__main__":
         response = send_to_serial(b'\x80')  # hex 0x80, integer 128
 
         if not response: # payload has no valid response
-            print("!!!Nothing received")
+            print("[INFO] No Response Received --> Resetting power...")
 
             power_off_zes_payload()
             save_to_log('POWER', 'Power Reset')
 
             pull_down_pin_nReset()
-            time.sleep(3)
+            time.sleep(1)
 
             power_on_zes_payload()
             time.sleep(1)
@@ -108,7 +110,7 @@ if __name__ == "__main__":
             time.sleep(1)
 
         else:  # payload has valid response
-            hexString = convert_byte_data_to_hex_string(response)
-            save_to_log('CMD', hexString)
-            time.sleep(10*60)    # sleep for 10 minutes
+            hexString = convert_byte_data_to_hex_string(response)  # convert the received byte data to its hex representation
+            save_to_log('CMD', hexString)  # log the response
+            time.sleep(OPERATION_INTERVAL_MINUTES*60)  # sleep for 10 minutes and go for another loop
 
