@@ -1,7 +1,7 @@
 import serial
 import time
 
-SERIAL_DEVICE = "/dev/ttyAMA0"    # serial device ending point
+SERIAL_DEVICE = "/dev/tty.usbserial-A50285BI"    # serial device ending point
 SERIAL_BAUDRATE = 9600
 
 
@@ -37,27 +37,27 @@ hasError = False
 while True:
         print(f'>>>  Trying for the {retry} time....')
 
-        res = send_to_serial(0x00)
+        res = send_to_serial(b'\x00')
         if res:
             print('>>> Test 00 passed.')
 
-        res = send_to_serial(0x20)
+        res = send_to_serial(b'\x20')
         if res:
             print('>>> Test 20 passed.')
 
-        res = send_to_serial(0x40)
+        res = send_to_serial(b'\x40')
         if res:
             print('>>> Test 40 passed.')
 
-        res = send_to_serial(0x60)
+        res = send_to_serial(b'\x60')
         if res:
             print('>>> Test 60 passed.')
 
-        res = send_to_serial(0x80)
+        res = send_to_serial(b'\x80')
         if res:
             print('>>> Test 80 passed.')
 
-        res = send_to_serial(0x40)
+        res = send_to_serial(b'\xA0')
         if res:
             print('>>> Test 20 passed.')
 
